@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Календарь мероприятий</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 16px;
+            color: var(--tg-theme-hint-color, #999);
+        }
+
+        .event-card {
+            background: var(--tg-theme-secondary-bg-color, #f8f8f8);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .event-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--tg-theme-button-color, #3390ec);
+        }
+
+        .event-date {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--tg-theme-button-color, #3390ec);
+            margin-bottom: 8px;
+        }
+
+        .event-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .event-details {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #666);
+            line-height: 1.6;
+        }
+
+        .event-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .status-open {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-closed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--tg-theme-bg-color, #ffffff);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--tg-theme-button-color, #3390ec);
+        }
+
+        .modal-info {
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .modal-info div {
+            margin-bottom: 8px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .btn-primary {
+            background: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+
+        .btn-secondary {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--tg-theme-secondary-bg-color, #e0e0e0);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color, #3390ec);
+        }
+
+        .success-message {
+            text-align: center;
+            color: #155724;
+            background: #d4edda;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #721c24;
+            background: #f8d7da;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎮 Календарь игр</h1>
+        <p>Выберите мероприятие для записи</p>
+    </div>
+
+    <div id="events-container">
+        <div class="loading">Загрузка мероприятий...</div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content" id="modal-content">
+            <!-- Контент модального окна будет добавлен через JS -->
+        </div>
+    </div>
+
+    <script>
+        // ВАЖНО: Замените этот URL на ваш URL из Google Apps Script
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxdm-cl1BVBj8-UAMRtNp8Q6jAoI-d_XueuAerz8yE3oq6ewsZsRKu7pb0OBHv6ZfI5/exec';
+
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        let currentEvent = null;
+        let allEvents = [];
+
+        // Загрузка мероприятий
+        async function loadEvents() {
+            try {
+                const response = await fetch(`${API_URL}?action=getEvents`);
+                const data = await response.json();
+
+                if (data.success) {
+                    allEvents = data.events;
+                    displayEvents(allEvents);
+                } else {
+                    document.getElementById('events-container').innerHTML = 
+                        '<div class="error-message">Ошибка загрузки данных</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('events-container').innerHTML = 
+                    '<div class="error-message">Ошибка подключения</div>';
+            }
+        }
+
+        // Отображение мероприятий
+        function displayEvents(events) {
+            const container = document.getElementById('events-container');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<div class="loading">Нет доступных мероприятий</div>';
+                return;
+            }
+
+            container.innerHTML = events.map(event => `
+                <div class="event-card" onclick="openModal(${events.indexOf(event)})">
+                    <div class="event-date">📅 ${event.date}</div>
+                    <div class="event-name">${event.event}</div>
+                    <div class="event-details">
+                        🕐 ${event.time}<br>
+                        📍 ${event.location}<br>
+                        💰 ${event.price}
+                    </div>
+                    <span class="event-status ${event.status === 'Открытый' ? 'status-open' : 'status-closed'}">
+                        ${event.status}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // Открытие модального окна
+        function openModal(index) {
+            currentEvent = allEvents[index];
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+
+            const isOpen = currentEvent.status === 'Открытый';
+
+            content.innerHTML = `
+                <div class="modal-header">${currentEvent.event}</div>
+                <div class="modal-info">
+                    <div><strong>📅 Дата:</strong> ${currentEvent.date}</div>
+                    <div><strong>🕐 Время:</strong> ${currentEvent.time}</div>
+                    <div><strong>📍 Локация:</strong> ${currentEvent.location}</div>
+                    <div><strong>💰 Стоимость:</strong> ${currentEvent.price}</div>
+                    <div><strong>📊 Статус:</strong> ${currentEvent.status}</div>
+                </div>
+                ${isOpen ? `
+                    <div class="input-group">
+                        <label for="telegram-input">Ваш Telegram ник:</label>
+                        <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramUsername()}">
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                        <button class="btn btn-primary" onclick="register()">Записаться</button>
+                    </div>
+                ` : `
+                    <div class="error-message">Регистрация закрыта</div>
+                    <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 16px;">Закрыть</button>
+                `}
+            `;
+
+            modal.classList.add('active');
+        }
+
+        // Закрытие модального окна
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Получение username из Telegram
+        function getTelegramUsername() {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
+            }
+            return '';
+        }
+
+        // Регистрация на мероприятие
+        async function register() {
+            const telegramInput = document.getElementById('telegram-input');
+            const telegram = telegramInput.value.trim();
+
+            if (!telegram) {
+                alert('Пожалуйста, введите ваш Telegram ник');
+                return;
+            }
+
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Отправка...';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'register',
+                        date: currentEvent.date,
+                        event: currentEvent.event,
+                        telegram: telegram
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('modal-content').innerHTML = `
+                        <div class="success-message">
+                            <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">
+                                Вы успешно записаны!
+                            </div>
+                            <div>${currentEvent.event}</div>
+                            <div>${currentEvent.date} в ${currentEvent.time}</div>
+                        </div>
+                        <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 20px; width: 100%;">
+                            Отлично!
+                        </button>
+                    `;
+                } else {
+                    alert('Ошибка регистрации. Попробуйте еще раз.');
+                    button.disabled = false;
+                    button.textContent = 'Записаться';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Ошибка соединения. Попробуйте еще раз.');
+                button.disabled = false;
+                button.textContent = 'Записаться';
+            }
+        }
+
+        // Закрытие модального окна при клике вне его
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Загрузка при старте
+        loadEvents();
+    </script>
+</body>
+</html>
