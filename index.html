@@ -245,20 +245,29 @@
         // Загрузка мероприятий
         async function loadEvents() {
             try {
-                const response = await fetch(`${API_URL}?action=getEvents`);
+                console.log('Загрузка с URL:', API_URL);
+                // Убираем ?action=getEvents, просто делаем GET запрос
+                const response = await fetch(API_URL);
+                console.log('Ответ получен:', response.status);
+                
                 const data = await response.json();
+                console.log('Данные:', data);
 
                 if (data.success) {
                     allEvents = data.events;
                     displayEvents(allEvents);
                 } else {
                     document.getElementById('events-container').innerHTML = 
-                        '<div class="error-message">Ошибка загрузки данных</div>';
+                        `<div class="error-message">Ошибка загрузки данных: ${data.error || 'Неизвестная ошибка'}</div>`;
                 }
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('events-container').innerHTML = 
-                    '<div class="error-message">Ошибка подключения</div>';
+                    `<div class="error-message">
+                        Ошибка подключения: ${error.message}<br><br>
+                        <small>URL: ${API_URL}<br>
+                        Проверьте консоль (F12) для деталей</small>
+                    </div>`;
             }
         }
 
@@ -350,19 +359,15 @@
             button.textContent = 'Отправка...';
 
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'register',
-                        date: currentEvent.date,
-                        event: currentEvent.event,
-                        telegram: telegram
-                    })
+                // Используем GET вместо POST для обхода CORS
+                const params = new URLSearchParams({
+                    action: 'register',
+                    date: currentEvent.date,
+                    event: currentEvent.event,
+                    telegram: telegram
                 });
-
+                
+                const response = await fetch(`${API_URL}?${params.toString()}`);
                 const data = await response.json();
 
                 if (data.success) {
@@ -380,13 +385,13 @@
                         </button>
                     `;
                 } else {
-                    alert('Ошибка регистрации. Попробуйте еще раз.');
+                    alert('Ошибка регистрации: ' + (data.error || 'Неизвестная ошибка'));
                     button.disabled = false;
                     button.textContent = 'Записаться';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Ошибка соединения. Попробуйте еще раз.');
+                alert('Ошибка соединения: ' + error.message);
                 button.disabled = false;
                 button.textContent = 'Записаться';
             }
