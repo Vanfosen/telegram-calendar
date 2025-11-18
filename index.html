@@ -410,7 +410,7 @@
 
     <script>
         // ВАЖНО: Замените этот URL на ваш URL из Google Apps Script
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxdm-cl1BVBj8-UAMRtNp8Q6jAoI-d_XueuAerz8yE3oq6ewsZsRKu7pb0OBHv6ZfI5/exec';
+        const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -457,12 +457,12 @@
 
             container.innerHTML = '<div class="calendar-grid">' + events.map((event, index) => `
                 <div class="event-card" onclick="openModal(${index})">
-                    <div class="event-date-badge">📅 ${event.date}</div>
+                    <div class="event-date-badge">${event.date}</div>
                     <div class="event-name">${event.event}</div>
                     <div class="event-details">
                         <div class="event-detail-item">
                             <span>🕐</span>
-                            <span>${event.time}</span>
+                            <span>Начало: ${event.time}</span>
                         </div>
                         <div class="event-detail-item">
                             <span>📍</span>
@@ -496,7 +496,7 @@
                         <span>${currentEvent.date}</span>
                     </div>
                     <div class="modal-info-item">
-                        <strong>🕐 Время:</strong>
+                        <strong>🕐 Время начала:</strong>
                         <span>${currentEvent.time}</span>
                     </div>
                     <div class="modal-info-item">
@@ -558,8 +558,8 @@
             button.textContent = 'Отправка...';
 
             try {
-                // Формируем дату и время в правильном формате
-                const eventDateTime = `${currentEvent.date} ${currentEvent.time}`;
+                // Формируем дату и время в формате "19.11.2025 20:00"
+                const eventDateTime = `${currentEvent.dateShort} ${currentEvent.time}`;
                 
                 // Используем GET вместо POST для обхода CORS
                 const params = new URLSearchParams({
@@ -585,7 +585,8 @@
                             <div class="success-title">Вы успешно записаны!</div>
                             <div class="success-details">
                                 <strong>${currentEvent.event}</strong><br>
-                                ${currentEvent.date} в ${currentEvent.time}<br>
+                                ${currentEvent.date}<br>
+                                Начало в ${currentEvent.time}<br>
                                 ${currentEvent.location}
                             </div>
                         </div>
