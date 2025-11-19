@@ -571,6 +571,11 @@
                         <span>${currentEvent.status}</span>
                     </div>
                 </div>
+                
+                <button class="btn btn-secondary" onclick="showParticipants()" style="width: 100%; margin-bottom: 20px;">
+                    👥 Кто записался
+                </button>
+                
                 ${isOpen ? `
                     <div class="input-group">
                         <label for="telegram-input">Ваш Telegram</label>
@@ -604,6 +609,69 @@
                 return '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
             }
             return '';
+        }
+
+        // Показать список участников
+        async function showParticipants() {
+            const content = document.getElementById('modal-content');
+            
+            content.innerHTML = `
+                <div class="modal-header">Участники</div>
+                <div class="loading">Загрузка списка...</div>
+            `;
+            
+            try {
+                const params = new URLSearchParams({
+                    action: 'getParticipants',
+                    eventDate: currentEvent.dateShort,
+                    eventName: currentEvent.event
+                });
+                
+                const response = await fetch(`${API_URL}?${params.toString()}`);
+                const data = await response.json();
+                
+                if (data.success && data.participants.length > 0) {
+                    const participantsList = data.participants.map((p, idx) => `
+                        <div class="modal-info-item">
+                            <strong>${idx + 1}.</strong>
+                            <span>${p.nickname} (${p.telegram})${p.confirmation ? ' - ' + p.confirmation : ''}</span>
+                        </div>
+                    `).join('');
+                    
+                    content.innerHTML = `
+                        <div class="modal-header">Участники мероприятия</div>
+                        <div style="margin-bottom: 20px; color: #c9a87c;">
+                            Всего записалось: <strong>${data.count}</strong>
+                        </div>
+                        <div class="modal-info">
+                            ${participantsList}
+                        </div>
+                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 20px; width: 100%;">
+                            Назад
+                        </button>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <div class="modal-header">Участники</div>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <p>Пока никто не записался</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 20px; width: 100%;">
+                            Назад
+                        </button>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                content.innerHTML = `
+                    <div class="modal-header">Ошибка</div>
+                    <div class="error-message">Не удалось загрузить список участников</div>
+                    <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 20px; width: 100%;">
+                        Назад
+                    </button>
+                `;
+            }
         }
 
         // Регистрация на мероприятие
