@@ -211,22 +211,22 @@
         }
 
         .modal-info {
-            margin-bottom: 28px;
-            line-height: 2;
+            margin-bottom: 32px;
+            line-height: 2.2;
         }
 
         .modal-info-item {
             display: flex;
             align-items: center;
-            margin-bottom: 12px;
-            padding: 8px;
+            margin-bottom: 16px;
+            padding: 12px;
             background: rgba(101, 67, 33, 0.3);
             border-radius: 8px;
         }
 
         .modal-info-item strong {
             color: #cda45e;
-            min-width: 120px;
+            min-width: 140px;
             font-size: 15px;
         }
 
@@ -558,19 +558,16 @@
             button.textContent = 'Отправка...';
 
             try {
-                // Формируем дату и время в формате "19.11.2025 20:00"
-                const eventDateTime = `${currentEvent.dateShort} ${currentEvent.time}`;
-                
                 // Используем GET вместо POST для обхода CORS
                 const params = new URLSearchParams({
                     action: 'register',
-                    eventDate: eventDateTime, // Дата и время мероприятия
+                    eventDateOnly: currentEvent.dateShort, // Только дата БЕЗ времени: "19.11.2025"
                     event: currentEvent.event, // Название турнира
                     telegram: telegram
                 });
                 
                 console.log('Отправка данных:', {
-                    eventDate: eventDateTime,
+                    eventDateOnly: currentEvent.dateShort,
                     event: currentEvent.event,
                     telegram: telegram
                 });
