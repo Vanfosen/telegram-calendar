@@ -517,6 +517,10 @@
                         <label for="telegram-input">Ваш Telegram ник:</label>
                         <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramUsername()}">
                     </div>
+                    <div class="input-group">
+                        <label for="nickname-input">Ваш игровой никнейм:</label>
+                        <input type="text" id="nickname-input" placeholder="Введите никнейм">
+                    </div>
                     <div class="modal-buttons">
                         <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
                         <button class="btn btn-primary" onclick="register()">Записаться</button>
@@ -546,10 +550,17 @@
         // Регистрация на мероприятие
         async function register() {
             const telegramInput = document.getElementById('telegram-input');
+            const nicknameInput = document.getElementById('nickname-input');
             const telegram = telegramInput.value.trim();
+            const nickname = nicknameInput.value.trim();
 
             if (!telegram) {
                 alert('Пожалуйста, введите ваш Telegram ник');
+                return;
+            }
+
+            if (!nickname) {
+                alert('Пожалуйста, введите ваш игровой никнейм');
                 return;
             }
 
@@ -558,18 +569,23 @@
             button.textContent = 'Отправка...';
 
             try {
+                // Формируем дату и время для столбца B: "19.11.2025 20:00"
+                const eventDateTime = `${currentEvent.dateShort} ${currentEvent.time}`;
+                
                 // Используем GET вместо POST для обхода CORS
                 const params = new URLSearchParams({
                     action: 'register',
-                    eventDateOnly: currentEvent.dateShort, // Только дата БЕЗ времени: "19.11.2025"
+                    eventDateTime: eventDateTime, // Дата и время мероприятия
                     event: currentEvent.event, // Название турнира
-                    telegram: telegram
+                    telegram: telegram, // Telegram
+                    nickname: nickname // Никнейм
                 });
                 
                 console.log('Отправка данных:', {
-                    eventDateOnly: currentEvent.dateShort,
+                    eventDateTime: eventDateTime,
                     event: currentEvent.event,
-                    telegram: telegram
+                    telegram: telegram,
+                    nickname: nickname
                 });
                 
                 const response = await fetch(`${API_URL}?${params.toString()}`);
@@ -584,7 +600,8 @@
                                 <strong>${currentEvent.event}</strong><br>
                                 ${currentEvent.date}<br>
                                 Начало в ${currentEvent.time}<br>
-                                ${currentEvent.location}
+                                ${currentEvent.location}<br><br>
+                                Игрок: <strong>${nickname}</strong>
                             </div>
                         </div>
                         <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 24px; width: 100%;">
