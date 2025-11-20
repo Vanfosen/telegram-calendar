@@ -468,8 +468,8 @@
     </div>
 
     <script>
-        // ВАЖНО: Замените этот URL на ваш URL из Google Apps Script
-        const API_URL = 'https://delicate-wind-a87d.vanfossengame.workers.dev/';
+        // 🔑 ИЗМЕНЕНО: базовый URL API (без слеша в конце!)
+        const API_BASE = 'https://delicate-wind-a87d.vanfossengame.workers.dev';
 
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -481,14 +481,14 @@
         // Загрузка мероприятий
         async function loadEvents() {
             try {
-                console.log('Загрузка с URL:', API_URL);
-                const response = await fetch(API_URL);
-                console.log('Ответ получен:', response.status);
+                console.log('Запрос к:', API_BASE + '/events');
+                const response = await fetch(API_BASE + '/events'); // ✅ ИЗМЕНЕНО: добавлен /events
+                console.log('Статус:', response.status);
                 
                 const data = await response.json();
                 console.log('Данные:', data);
 
-                if (data.success && data.events.length > 0) {
+                if (data.success && data.events?.length > 0) {
                     allEvents = data.events;
                     displayEvents(allEvents);
                 } else {
@@ -496,11 +496,11 @@
                         '<div class="empty-state"><div class="empty-state-icon">📅</div><p>Нет доступных мероприятий</p></div>';
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Ошибка загрузки:', error);
                 document.getElementById('events-container').innerHTML = 
                     `<div class="error-message">
                         ❌ Ошибка подключения: ${error.message}<br><br>
-                        <small>Проверьте настройки API</small>
+                        <small>Проверьте: ${API_BASE}/events</small>
                     </div>`;
             }
         }
@@ -579,7 +579,7 @@
                 ${isOpen ? `
                     <div class="input-group">
                         <label for="telegram-input">Ваш Telegram</label>
-                        <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramUsername()}">
+                        <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramSafeId()}">
                     </div>
                     <div class="input-group">
                         <label for="nickname-input">Игровой никнейм</label>
@@ -603,12 +603,13 @@
             document.getElementById('modal').classList.remove('active');
         }
 
-        // Получение username из Telegram
-        function getTelegramUsername() {
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                return '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
-            }
-            return '';
+        // 🔑 ИЗМЕНЕНО: безопасное получение Telegram ID
+        function getTelegramSafeId() {
+            const user = tg.initDataUnsafe?.user;
+            if (!user) return '';
+            return user.username 
+                ? '@' + user.username 
+                : 'id' + user.id;
         }
 
         // Показать список участников
@@ -621,16 +622,15 @@
             `;
             
             try {
-                const params = new URLSearchParams({
-                    action: 'getParticipants',
-                    eventDate: currentEvent.dateShort,
-                    eventName: currentEvent.event
-                });
+                // ✅ ИЗМЕНЕНО: явный endpoint /participants
+                const url = new URL(API_BASE + '/participants');
+                url.searchParams.append('eventDate', currentEvent.dateShort);
+                url.searchParams.append('eventName', currentEvent.event);
                 
-                const response = await fetch(`${API_URL}?${params.toString()}`);
+                const response = await fetch(url);
                 const data = await response.json();
                 
-                if (data.success && data.participants.length > 0) {
+                if (data.success && data.participants?.length > 0) {
                     const participantsList = data.participants.map((p, idx) => `
                         <div class="modal-info-item">
                             <strong>${idx + 1}.</strong>
@@ -663,7 +663,7 @@
                     `;
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Ошибка загрузки участников:', error);
                 content.innerHTML = `
                     <div class="modal-header">Ошибка</div>
                     <div class="error-message">Не удалось загрузить список участников</div>
@@ -696,28 +696,17 @@
             button.textContent = 'Отправка...';
 
             try {
-                // Формируем дату и время для столбца B: "19.11.2025 20:00"
-                const eventDateTime = `${currentEvent.dateShort} ${currentEvent.time}`;
+                // ✅ ИЗМЕНЕНО: явный endpoint /register
+                const url = new URL(API_BASE + '/register');
+                url.searchParams.append('eventDateTime', `${currentEvent.dateShort} ${currentEvent.time}`);
+                url.searchParams.append('event', currentEvent.event);
+                url.searchParams.append('telegram', telegram);
+                url.searchParams.append('nickname', nickname);
+                url.searchParams.append('location', currentEvent.location);
                 
-                // Используем GET вместо POST для обхода CORS
-                const params = new URLSearchParams({
-                    action: 'register',
-                    eventDateTime: eventDateTime, // Дата и время мероприятия
-                    event: currentEvent.event, // Название турнира
-                    telegram: telegram, // Telegram
-                    nickname: nickname, // Никнейм
-                    location: currentEvent.location // Локация
-                });
-                
-                console.log('Отправка данных:', {
-                    eventDateTime: eventDateTime,
-                    event: currentEvent.event,
-                    telegram: telegram,
-                    nickname: nickname,
-                    location: currentEvent.location
-                });
-                
-                const response = await fetch(`${API_URL}?${params.toString()}`);
+                console.log('Регистрация:', url.toString());
+
+                const response = await fetch(url);
                 const data = await response.json();
 
                 if (data.success) {
@@ -743,7 +732,7 @@
                     button.textContent = 'Записаться';
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Ошибка:', error);
                 alert('❌ Ошибка соединения: ' + error.message);
                 button.disabled = false;
                 button.textContent = 'Записаться';
