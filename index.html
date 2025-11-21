@@ -24,60 +24,60 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 16px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 48px;
-            padding: 40px 28px;
+            margin-bottom: 24px;
+            padding: 24px 20px;
             background: rgba(101, 67, 33, 0.25);
-            border-radius: 24px;
+            border-radius: 20px;
             backdrop-filter: blur(10px);
             border: 2px solid rgba(139, 111, 71, 0.4);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
         }
 
         .header h1 {
-            font-size: 42px;
-            margin-bottom: 16px;
+            font-size: 26px;
+            margin-bottom: 8px;
             color: #c9a87c;
-            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8);
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
             font-weight: 800;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
         .header p {
-            font-size: 18px;
+            font-size: 14px;
             color: #e5ddd5;
             opacity: 0.9;
             font-weight: 400;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .loading {
             text-align: center;
-            padding: 60px 20px;
-            font-size: 18px;
+            padding: 40px 20px;
+            font-size: 16px;
             color: #c9a87c;
         }
 
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 24px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
         }
 
         .event-card {
             background: linear-gradient(135deg, rgba(101, 67, 33, 0.4), rgba(101, 67, 33, 0.2));
-            border-radius: 20px;
-            padding: 28px;
+            border-radius: 16px;
+            padding: 18px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1.5px solid rgba(139, 111, 71, 0.4);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
             position: relative;
             overflow: hidden;
         }
@@ -88,10 +88,10 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
+            height: 2px;
             background: linear-gradient(90deg, #c9a87c, #a0826d);
             transform: scaleX(0);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .event-card:hover::before {
@@ -99,8 +99,8 @@
         }
 
         .event-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(160, 130, 109, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(160, 130, 109, 0.4);
             border-color: #c9a87c;
             background: linear-gradient(135deg, rgba(101, 67, 33, 0.5), rgba(101, 67, 33, 0.3));
         }
@@ -109,41 +109,54 @@
             display: inline-block;
             background: linear-gradient(135deg, #8b6f47, #a0826d);
             color: #1a1410;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 14px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 700;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 12px rgba(139, 111, 71, 0.4);
-            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            box-shadow: 0 3px 10px rgba(139, 111, 71, 0.4);
+            letter-spacing: 0.3px;
+        }
+
+        .resident-badge {
+            display: inline-block;
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            border: 1.5px solid rgba(255, 193, 7, 0.4);
+            margin-left: 6px;
         }
 
         .event-name {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
             color: #c9a87c;
             line-height: 1.3;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         .event-details {
-            font-size: 15px;
+            font-size: 13px;
             color: #e5ddd5;
-            line-height: 1.9;
-            margin-bottom: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
         }
 
         .event-detail-item {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 6px 0;
+            margin-bottom: 6px;
+            padding: 4px 0;
         }
 
         .event-detail-item span:first-child {
-            margin-right: 10px;
-            font-size: 18px;
+            margin-right: 8px;
+            font-size: 16px;
             filter: grayscale(20%);
         }
 
@@ -154,13 +167,13 @@
 
         .event-status {
             display: inline-block;
-            padding: 8px 18px;
-            border-radius: 25px;
-            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
             font-weight: 700;
-            margin-top: 14px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-            letter-spacing: 0.5px;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.3px;
         }
 
         .status-open {
@@ -195,21 +208,21 @@
 
         .modal-content {
             background: #1a1410;
-            border-radius: 28px;
-            padding: 36px;
+            border-radius: 24px;
+            padding: 24px;
             max-width: 90%;
             max-height: 85%;
             overflow-y: auto;
             position: relative;
             border: 2px solid rgba(139, 111, 71, 0.5);
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9);
-            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+            animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(40px) scale(0.95);
+                transform: translateY(30px) scale(0.95);
             }
             to {
                 opacity: 1;
@@ -218,29 +231,29 @@
         }
 
         .modal-header {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 700;
-            margin-bottom: 28px;
+            margin-bottom: 20px;
             color: #c9a87c;
             border-bottom: 2px solid rgba(139, 111, 71, 0.4);
-            padding-bottom: 18px;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            padding-bottom: 12px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         .modal-info {
-            margin-bottom: 32px;
-            line-height: 2.2;
+            margin-bottom: 20px;
+            line-height: 1.8;
         }
 
         .modal-info-item {
             display: flex;
             align-items: center;
-            margin-bottom: 16px;
-            padding: 14px;
+            margin-bottom: 10px;
+            padding: 10px;
             background: rgba(101, 67, 33, 0.3);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid rgba(139, 111, 71, 0.2);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .modal-info-item:hover {
@@ -250,38 +263,38 @@
 
         .modal-info-item strong {
             color: #c9a87c;
-            min-width: 140px;
-            font-size: 15px;
+            min-width: 120px;
+            font-size: 13px;
             font-weight: 700;
         }
 
         .modal-info-item span {
             color: #ffffff;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 500;
         }
 
         .modal-buttons {
             display: flex;
-            gap: 14px;
+            gap: 10px;
         }
 
         .btn {
             flex: 1;
-            padding: 18px;
+            padding: 14px;
             border: none;
-            border-radius: 14px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.3px;
         }
 
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
         }
 
         .btn-primary {
@@ -311,24 +324,24 @@
         }
 
         .input-group {
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 700;
             color: #c9a87c;
-            font-size: 15px;
+            font-size: 13px;
             letter-spacing: 0.3px;
         }
 
         .input-group input {
             width: 100%;
-            padding: 16px;
+            padding: 12px;
             border: 2px solid rgba(139, 111, 71, 0.4);
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 14px;
             background: rgba(101, 67, 33, 0.2);
             color: #ffffff;
             transition: all 0.3s ease;
@@ -339,7 +352,7 @@
             outline: none;
             border-color: #c9a87c;
             background: rgba(101, 67, 33, 0.35);
-            box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.15);
+            box-shadow: 0 0 0 3px rgba(201, 168, 124, 0.15);
         }
 
         .input-group input::placeholder {
@@ -350,17 +363,17 @@
             text-align: center;
             color: #81c784;
             background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(56, 142, 60, 0.15));
-            padding: 32px;
-            border-radius: 20px;
-            margin-top: 16px;
+            padding: 24px;
+            border-radius: 16px;
+            margin-top: 12px;
             border: 2px solid rgba(129, 199, 132, 0.3);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .success-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-size: 60px;
+            margin-bottom: 16px;
+            animation: successPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             font-weight: 300;
         }
 
@@ -369,7 +382,7 @@
                 transform: scale(0) rotate(-180deg);
             }
             50% {
-                transform: scale(1.3) rotate(10deg);
+                transform: scale(1.2) rotate(10deg);
             }
             100% {
                 transform: scale(1) rotate(0);
@@ -377,74 +390,105 @@
         }
 
         .success-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: #a5d6a7;
         }
 
         .success-details {
-            font-size: 16px;
+            font-size: 14px;
             opacity: 0.9;
-            margin-top: 10px;
+            margin-top: 8px;
             color: #e5ddd5;
-            line-height: 1.7;
+            line-height: 1.6;
         }
 
         .error-message {
             text-align: center;
             color: #ef9a9a;
             background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(211, 47, 47, 0.15));
-            padding: 28px;
-            border-radius: 20px;
-            margin-top: 16px;
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 12px;
             border: 2px solid rgba(239, 154, 154, 0.3);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 20px;
             color: #c9a87c;
         }
 
         .empty-state-icon {
-            font-size: 72px;
-            margin-bottom: 20px;
+            font-size: 60px;
+            margin-bottom: 16px;
             opacity: 0.5;
         }
 
-        /* Scrollbar styling */
+        /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 12px;
+            width: 10px;
         }
 
         ::-webkit-scrollbar-track {
             background: rgba(26, 20, 16, 0.5);
-            border-radius: 10px;
+            border-radius: 8px;
         }
 
         ::-webkit-scrollbar-thumb {
             background: linear-gradient(135deg, #8b6f47, #a0826d);
-            border-radius: 10px;
+            border-radius: 8px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(135deg, #c9a87c, #8b6f47);
         }
 
-        /* Адаптивность */
+        /* Mobile optimizations */
         @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
             .calendar-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .header {
+                padding: 20px 16px;
+                margin-bottom: 20px;
             }
 
             .header h1 {
-                font-size: 28px;
+                font-size: 22px;
+                margin-bottom: 6px;
+            }
+
+            .header p {
+                font-size: 13px;
             }
 
             .modal-content {
-                padding: 24px;
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .modal-header {
+                font-size: 20px;
+                margin-bottom: 16px;
+                padding-bottom: 10px;
+            }
+
+            .modal-info-item strong {
+                min-width: 100px;
+                font-size: 12px;
+            }
+
+            .modal-info-item span {
+                font-size: 12px;
             }
         }
     </style>
@@ -468,7 +512,6 @@
     </div>
 
     <script>
-        // 🔑 ИЗМЕНЕНО: базовый URL API (без слеша в конце!)
         const API_BASE = 'https://delicate-wind-a87d.vanfossengame.workers.dev';
 
         let tg = window.Telegram.WebApp;
@@ -482,7 +525,7 @@
         async function loadEvents() {
             try {
                 console.log('Запрос к:', API_BASE + '/events');
-                const response = await fetch(API_BASE + '/events'); // ✅ ИЗМЕНЕНО: добавлен /events
+                const response = await fetch(API_BASE + '/events');
                 console.log('Статус:', response.status);
                 
                 const data = await response.json();
@@ -507,118 +550,116 @@
 
         // Отображение мероприятий
         function displayEvents(events) {
-    const container = document.getElementById('events-container');
-    
-    if (events.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><p>Нет доступных мероприятий</p></div>';
-        return;
-    }
+            const container = document.getElementById('events-container');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><p>Нет доступных мероприятий</p></div>';
+                return;
+            }
 
-    container.innerHTML = '<div class="calendar-grid">' + events.map((event, index) => {
-        const isResident = event.residentStatus === 'Резидентский';
-        
-        return `
-        <div class="event-card" onclick="openModal(${index})">
-            <div class="event-date-badge">${event.date}</div>
-            ${isResident ? `
-                <div style="display: inline-block; background: rgba(255, 193, 7, 0.2); color: #ffc107; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 12px; border: 1.5px solid rgba(255, 193, 7, 0.4);">
-                    🔒 Только резиденты
+            container.innerHTML = '<div class="calendar-grid">' + events.map((event, index) => {
+                const isResident = event.residentStatus === 'Резидентский';
+                
+                return `
+                <div class="event-card" onclick="openModal(${index})">
+                    <div class="event-date-badge">${event.date}</div>
+                    ${isResident ? '<span class="resident-badge">🔒 Резиденты</span>' : ''}
+                    <div class="event-name">${event.event}</div>
+                    <div class="event-details">
+                        <div class="event-detail-item">
+                            <span>🕐</span>
+                            <span>${event.time}</span>
+                        </div>
+                        <div class="event-detail-item">
+                            <span>📍</span>
+                            <span>${event.location}</span>
+                        </div>
+                        <div class="event-detail-item">
+                            <span>💰</span>
+                            <span>${event.price}</span>
+                        </div>
+                    </div>
+                    <span class="event-status ${event.status === 'Открытый' ? 'status-open' : 'status-closed'}">
+                        ${event.status === 'Открытый' ? '✓ Открыта' : '✕ Закрыта'}
+                    </span>
                 </div>
-            ` : ''}
-            <div class="event-name">${event.event}</div>
-            <div class="event-details">
-                <div class="event-detail-item">
-                    <span>🕐</span>
-                    <span>Начало: ${event.time}</span>
-                </div>
-                <div class="event-detail-item">
-                    <span>📍</span>
-                    <span>${event.location}</span>
-                </div>
-                <div class="event-detail-item">
-                    <span>💰</span>
-                    <span>${event.price}</span>
-                </div>
-            </div>
-            <span class="event-status ${event.status === 'Открытый' ? 'status-open' : 'status-closed'}">
-                ${event.status === 'Открытый' ? '✓ Открыта запись' : '✕ Запись закрыта'}
-            </span>
-        </div>
-    `}).join('') + '</div>';
-}
+            `}).join('') + '</div>';
+        }
 
         // Открытие модального окна
-      function openModal(index) {
-    currentEvent = allEvents[index];
-    const modal = document.getElementById('modal');
-    const content = document.getElementById('modal-content');
+        function openModal(index) {
+            currentEvent = allEvents[index];
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
 
-    const isOpen = currentEvent.status === 'Открытый';
-    const isResident = currentEvent.residentStatus === 'Резидентский';
+            const isOpen = currentEvent.status === 'Открытый';
+            const isResident = currentEvent.residentStatus === 'Резидентский';
 
-    content.innerHTML = `
-        <div class="modal-header">${currentEvent.event}</div>
-        <div class="modal-info">
-            <div class="modal-info-item">
-                <strong>Дата:</strong>
-                <span>${currentEvent.date}</span>
-            </div>
-            <div class="modal-info-item">
-                <strong>Время начала:</strong>
-                <span>${currentEvent.time}</span>
-            </div>
-            <div class="modal-info-item">
-                <strong>Локация:</strong>
-                <span>${currentEvent.location}</span>
-            </div>
-            <div class="modal-info-item">
-                <strong>Стоимость:</strong>
-                <span>${currentEvent.price}</span>
-            </div>
-            <div class="modal-info-item">
-                <strong>Статус:</strong>
-                <span>${currentEvent.status}</span>
-            </div>
-            ${isResident ? `
-                <div class="modal-info-item" style="background: rgba(255, 193, 7, 0.2); border-color: rgba(255, 193, 7, 0.4);">
-                    <strong>🔒 Тип:</strong>
-                    <span style="color: #ffc107;">Предварительная запись</span>
+            content.innerHTML = `
+                <div class="modal-header">${currentEvent.event}</div>
+                <div class="modal-info">
+                    <div class="modal-info-item">
+                        <strong>Дата:</strong>
+                        <span>${currentEvent.date}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <strong>Время:</strong>
+                        <span>${currentEvent.time}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <strong>Локация:</strong>
+                        <span>${currentEvent.location}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <strong>Стоимость:</strong>
+                        <span>${currentEvent.price}</span>
+                    </div>
+                    <div class="modal-info-item">
+                        <strong>Статус:</strong>
+                        <span>${currentEvent.status}</span>
+                    </div>
+                    ${isResident ? `
+                        <div class="modal-info-item" style="background: rgba(255, 193, 7, 0.2); border-color: rgba(255, 193, 7, 0.4);">
+                            <strong>🔒 Тип:</strong>
+                            <span style="color: #ffc107;">Только резиденты</span>
+                        </div>
+                    ` : ''}
                 </div>
-            ` : ''}
-        </div>
-        
-        <button class="btn btn-secondary" onclick="showParticipants()" style="width: 100%; margin-bottom: 20px;">
-            👥 Кто записан
-        </button>
-        
-        ${isOpen ? `
-            <div class="input-group">
-                <label for="telegram-input">Ваш Telegram</label>
-                <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramSafeId()}">
-            </div>
-            <div class="input-group">
-                <label for="nickname-input">Игровой никнейм</label>
-                <input type="text" id="nickname-input" placeholder="Введите никнейм">
-            </div>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-                <button class="btn btn-primary" onclick="register()">Записаться</button>
-            </div>
-        ` : `
-            <div class="error-message">Регистрация на это мероприятие закрыта</div>
-            <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 20px; width: 100%;">Закрыть</button>
-        `}
-    `;
+                
+                <button class="btn btn-secondary" onclick="showParticipants()" style="width: 100%; margin-bottom: 16px;">
+                    👥 Кто записан
+                </button>
+                
+                ${isOpen ? `
+                    <div class="input-group">
+                        <label for="telegram-input">Ваш Telegram</label>
+                        <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramSafeId()}">
+                    </div>
+                    ${!isResident ? `
+                        <div class="input-group">
+                            <label for="nickname-input">Игровой никнейм</label>
+                            <input type="text" id="nickname-input" placeholder="Введите никнейм">
+                        </div>
+                    ` : ''}
+                    <div class="modal-buttons">
+                        <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                        <button class="btn btn-primary" onclick="register()">Записаться</button>
+                    </div>
+                ` : `
+                    <div class="error-message">Регистрация закрыта</div>
+                    <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 16px; width: 100%;">Закрыть</button>
+                `}
+            `;
 
-    modal.classList.add('active');
-}
+            modal.classList.add('active');
+        }
 
         // Закрытие модального окна
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
         }
 
-        // 🔑 ИЗМЕНЕНО: безопасное получение Telegram ID
+        // Безопасное получение Telegram ID
         function getTelegramSafeId() {
             const user = tg.initDataUnsafe?.user;
             if (!user) return '';
@@ -633,11 +674,10 @@
             
             content.innerHTML = `
                 <div class="modal-header">Участники</div>
-                <div class="loading">Загрузка списка...</div>
+                <div class="loading">Загрузка...</div>
             `;
             
             try {
-                // ✅ ИЗМЕНЕНО: явный endpoint /participants
                 const url = new URL(API_BASE + '/participants');
                 url.searchParams.append('eventDate', currentEvent.dateShort);
                 url.searchParams.append('eventName', currentEvent.event);
@@ -655,8 +695,8 @@
                     
                     content.innerHTML = `
                         <div class="modal-header">Участники мероприятия</div>
-                        <div style="margin-bottom: 20px; color: #c9a87c;">
-                            Всего записалось: <strong>${data.count}</strong>
+                        <div style="margin-bottom: 16px; color: #c9a87c; font-size: 14px;">
+                            Всего: <strong>${data.count}</strong>
                         </div>
                         <div class="modal-info">
                             ${participantsList}
@@ -666,110 +706,17 @@
                         </button>
                     `;
                 } else {
-                    content.innerHTML = `
-                        <div class="modal-header">Участники</div>
-                        <div class="empty-state">
-                            <div class="empty-state-icon">👥</div>
-                            <p>Пока никто не записался</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 20px; width: 100%;">
-                            Назад
-                        </button>
-                    `;
+                    alert('❌ Ошибка регистрации: ' + (data.message || data.error || 'Неизвестная ошибка'));
+                    button.disabled = false;
+                    button.textContent = 'Записаться';
                 }
             } catch (error) {
-                console.error('Ошибка загрузки участников:', error);
-                content.innerHTML = `
-                    <div class="modal-header">Ошибка</div>
-                    <div class="error-message">Не удалось загрузить список участников</div>
-                    <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 20px; width: 100%;">
-                        Назад
-                    </button>
-                `;
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка соединения: ' + error.message);
+                button.disabled = false;
+                button.textContent = 'Записаться';
             }
         }
-
-        // Регистрация на мероприятие
-        async function register() {
-    const telegramInput = document.getElementById('telegram-input');
-    const nicknameInput = document.getElementById('nickname-input');
-    const telegram = telegramInput.value.trim();
-    const nickname = nicknameInput.value.trim();
-
-    if (!telegram) {
-        alert('Пожалуйста, введите ваш Telegram ник');
-        return;
-    }
-
-    if (!nickname) {
-        alert('Пожалуйста, введите ваш игровой никнейм');
-        return;
-    }
-
-    const button = event.target;
-    button.disabled = true;
-    button.textContent = 'Отправка...';
-
-    try {
-        const url = new URL(API_BASE + '/register');
-        url.searchParams.append('eventDateTime', `${currentEvent.dateShort} ${currentEvent.time}`);
-        url.searchParams.append('event', currentEvent.event);
-        url.searchParams.append('telegram', telegram);
-        url.searchParams.append('nickname', nickname);
-        url.searchParams.append('location', currentEvent.location);
-        url.searchParams.append('residentStatus', currentEvent.residentStatus || '');
-        
-        console.log('Регистрация:', url.toString());
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.success) {
-            document.getElementById('modal-content').innerHTML = `
-                <div class="success-message">
-                    <div class="success-icon">✓</div>
-                    <div class="success-title">Вы успешно записаны!</div>
-                    <div class="success-details">
-                        <strong>${currentEvent.event}</strong><br>
-                        ${currentEvent.date}<br>
-                        Начало в ${currentEvent.time}<br>
-                        ${currentEvent.location}<br><br>
-                        Игрок: <strong>${nickname}</strong>
-                    </div>
-                </div>
-                <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 24px; width: 100%;">
-                    Отлично!
-                </button>
-            `;
-        } else if (data.error === 'resident_only') {
-            document.getElementById('modal-content').innerHTML = `
-                <div class="modal-header">🔒 Доступ ограничен</div>
-                <div class="error-message">
-                    <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
-                    <div style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">
-                        Только для резидентов
-                    </div>
-                    <div style="font-size: 15px; line-height: 1.6;">
-                        Предварительная запись доступна только для резидентов клуба.<br><br>
-                        Для получения статуса резидента свяжитесь с администрацией.
-                    </div>
-                </div>
-                <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
-                    Назад
-                </button>
-            `;
-        } else {
-            alert('❌ Ошибка регистрации: ' + (data.message || data.error || 'Неизвестная ошибка'));
-            button.disabled = false;
-            button.textContent = 'Записаться';
-        }
-    } catch (error) {
-        console.error('Ошибка:', error);
-        alert('❌ Ошибка соединения: ' + error.message);
-        button.disabled = false;
-        button.textContent = 'Записаться';
-    }
-}
 
         // Закрытие модального окна при клике вне его
         document.getElementById('modal').addEventListener('click', function(e) {
@@ -782,4 +729,103 @@
         loadEvents();
     </script>
 </body>
-</html>
+</html>margin-top: 16px; width: 100%;">
+                            Назад
+                        </button>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <div class="modal-header">Участники</div>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <p>Пока никто не записался</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 16px; width: 100%;">
+                            Назад
+                        </button>
+                    `;
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки участников:', error);
+                content.innerHTML = `
+                    <div class="modal-header">Ошибка</div>
+                    <div class="error-message">Не удалось загрузить список</div>
+                    <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 16px; width: 100%;">
+                        Назад
+                    </button>
+                `;
+            }
+        }
+
+        // Регистрация на мероприятие
+        async function register() {
+            const telegramInput = document.getElementById('telegram-input');
+            const telegram = telegramInput.value.trim();
+            
+            const isResident = currentEvent.residentStatus === 'Резидентский';
+            
+            let nickname = '';
+            if (!isResident) {
+                const nicknameInput = document.getElementById('nickname-input');
+                nickname = nicknameInput.value.trim();
+                
+                if (!nickname) {
+                    alert('Пожалуйста, введите ваш игровой никнейм');
+                    return;
+                }
+            }
+
+            if (!telegram) {
+                alert('Пожалуйста, введите ваш Telegram ник');
+                return;
+            }
+
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Отправка...';
+
+            try {
+                const url = new URL(API_BASE + '/register');
+                url.searchParams.append('eventDateTime', `${currentEvent.dateShort} ${currentEvent.time}`);
+                url.searchParams.append('event', currentEvent.event);
+                url.searchParams.append('telegram', telegram);
+                url.searchParams.append('nickname', nickname);
+                url.searchParams.append('location', currentEvent.location);
+                url.searchParams.append('residentStatus', currentEvent.residentStatus || '');
+                
+                console.log('Регистрация:', url.toString());
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('modal-content').innerHTML = `
+                        <div class="success-message">
+                            <div class="success-icon">✓</div>
+                            <div class="success-title">Вы успешно записаны!</div>
+                            <div class="success-details">
+                                <strong>${currentEvent.event}</strong><br>
+                                ${currentEvent.date}<br>
+                                Время: ${currentEvent.time}<br>
+                                ${currentEvent.location}<br><br>
+                                Игрок: <strong>${data.nickname || nickname}</strong>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 20px; width: 100%;">
+                            Отлично!
+                        </button>
+                    `;
+                } else if (data.error === 'resident_only') {
+                    document.getElementById('modal-content').innerHTML = `
+                        <div class="modal-header">🔒 Доступ ограничен</div>
+                        <div class="error-message">
+                            <div style="font-size: 40px; margin-bottom: 12px;">⚠️</div>
+                            <div style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">
+                                Только для резидентов
+                            </div>
+                            <div style="font-size: 13px; line-height: 1.6;">
+                                Предварительная запись доступна только для резидентов клуба.<br><br>
+                                Для получения статуса свяжитесь с администрацией.
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="
