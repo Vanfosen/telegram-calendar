@@ -649,7 +649,7 @@
                     const participantsList = data.participants.map((p, idx) => `
                         <div class="modal-info-item">
                             <strong>${idx + 1}.</strong>
-                            <span>${p.nickname} (${p.telegram})${p.confirmation ? ' - ' + p.confirmation : ''}</span>
+                            <span>${p.nickname}${p.confirmation ? ' — ' + p.confirmation : ''}</span>
                         </div>
                     `).join('');
                     
