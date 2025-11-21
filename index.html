@@ -427,7 +427,6 @@
             opacity: 0.5;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -446,7 +445,6 @@
             background: linear-gradient(135deg, #c9a87c, #8b6f47);
         }
 
-        /* Mobile optimizations */
         @media (max-width: 768px) {
             .container {
                 padding: 12px;
@@ -506,9 +504,7 @@
     </div>
 
     <div id="modal" class="modal">
-        <div class="modal-content" id="modal-content">
-            <!-- Контент модального окна будет добавлен через JS -->
-        </div>
+        <div class="modal-content" id="modal-content"></div>
     </div>
 
     <script>
@@ -521,7 +517,6 @@
         let currentEvent = null;
         let allEvents = [];
 
-        // Загрузка мероприятий
         async function loadEvents() {
             try {
                 console.log('Запрос к:', API_BASE + '/events');
@@ -541,14 +536,10 @@
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
                 document.getElementById('events-container').innerHTML = 
-                    `<div class="error-message">
-                        ❌ Ошибка подключения: ${error.message}<br><br>
-                        <small>Проверьте: ${API_BASE}/events</small>
-                    </div>`;
+                    `<div class="error-message">❌ Ошибка подключения: ${error.message}</div>`;
             }
         }
 
-        // Отображение мероприятий
         function displayEvents(events) {
             const container = document.getElementById('events-container');
             
@@ -586,7 +577,6 @@
             `}).join('') + '</div>';
         }
 
-        // Открытие модального окна
         function openModal(index) {
             currentEvent = allEvents[index];
             const modal = document.getElementById('modal');
@@ -654,21 +644,16 @@
             modal.classList.add('active');
         }
 
-        // Закрытие модального окна
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
         }
 
-        // Безопасное получение Telegram ID
         function getTelegramSafeId() {
             const user = tg.initDataUnsafe?.user;
             if (!user) return '';
-            return user.username 
-                ? '@' + user.username 
-                : 'id' + user.id;
+            return user.username ? '@' + user.username : 'id' + user.id;
         }
 
-        // Показать список участников
         async function showParticipants() {
             const content = document.getElementById('modal-content');
             
@@ -701,35 +686,7 @@
                         <div class="modal-info">
                             ${participantsList}
                         </div>
-                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 20px; width: 100%;">
-                            Назад
-                        </button>
-                    `;
-                } else {
-                    alert('❌ Ошибка регистрации: ' + (data.message || data.error || 'Неизвестная ошибка'));
-                    button.disabled = false;
-                    button.textContent = 'Записаться';
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('❌ Ошибка соединения: ' + error.message);
-                button.disabled = false;
-                button.textContent = 'Записаться';
-            }
-        }
-
-        // Закрытие модального окна при клике вне его
-        document.getElementById('modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
-        // Загрузка при старте
-        loadEvents();
-    </script>
-</body>
-</html>margin-top: 16px; width: 100%;">
+                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 16px; width: 100%;">
                             Назад
                         </button>
                     `;
@@ -757,7 +714,6 @@
             }
         }
 
-        // Регистрация на мероприятие
         async function register() {
             const telegramInput = document.getElementById('telegram-input');
             const telegram = telegramInput.value.trim();
@@ -827,4 +783,16 @@
                                 Для получения статуса свяжитесь с администрацией.
                             </div>
                         </div>
-                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="
+                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 20px; width: 100%;">
+                            Назад
+                        </button>
+                    `;
+                } else {
+                    alert('❌ Ошибка регистрации: ' + (data.message || data.error || 'Неизвестная ошибка'));
+                    button.disabled = false;
+                    button.textContent = 'Записаться';
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка соединения: ' + error.message);
+                button
