@@ -507,96 +507,111 @@
 
         // Отображение мероприятий
         function displayEvents(events) {
-            const container = document.getElementById('events-container');
-            
-            if (events.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><p>Нет доступных мероприятий</p></div>';
-                return;
-            }
+    const container = document.getElementById('events-container');
+    
+    if (events.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><p>Нет доступных мероприятий</p></div>';
+        return;
+    }
 
-            container.innerHTML = '<div class="calendar-grid">' + events.map((event, index) => `
-                <div class="event-card" onclick="openModal(${index})">
-                    <div class="event-date-badge">${event.date}</div>
-                    <div class="event-name">${event.event}</div>
-                    <div class="event-details">
-                        <div class="event-detail-item">
-                            <span>🕐</span>
-                            <span>Начало: ${event.time}</span>
-                        </div>
-                        <div class="event-detail-item">
-                            <span>📍</span>
-                            <span>${event.location}</span>
-                        </div>
-                        <div class="event-detail-item">
-                            <span>💰</span>
-                            <span>${event.price}</span>
-                        </div>
-                    </div>
-                    <span class="event-status ${event.status === 'Открытый' ? 'status-open' : 'status-closed'}">
-                        ${event.status === 'Открытый' ? '✓ Открыта запись' : '✕ Запись закрыта'}
-                    </span>
+    container.innerHTML = '<div class="calendar-grid">' + events.map((event, index) => {
+        const isResident = event.residentStatus === 'Резидентский';
+        
+        return `
+        <div class="event-card" onclick="openModal(${index})">
+            <div class="event-date-badge">${event.date}</div>
+            ${isResident ? `
+                <div style="display: inline-block; background: rgba(255, 193, 7, 0.2); color: #ffc107; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 12px; border: 1.5px solid rgba(255, 193, 7, 0.4);">
+                    🔒 Только резиденты
                 </div>
-            `).join('') + '</div>';
-        }
+            ` : ''}
+            <div class="event-name">${event.event}</div>
+            <div class="event-details">
+                <div class="event-detail-item">
+                    <span>🕐</span>
+                    <span>Начало: ${event.time}</span>
+                </div>
+                <div class="event-detail-item">
+                    <span>📍</span>
+                    <span>${event.location}</span>
+                </div>
+                <div class="event-detail-item">
+                    <span>💰</span>
+                    <span>${event.price}</span>
+                </div>
+            </div>
+            <span class="event-status ${event.status === 'Открытый' ? 'status-open' : 'status-closed'}">
+                ${event.status === 'Открытый' ? '✓ Открыта запись' : '✕ Запись закрыта'}
+            </span>
+        </div>
+    `}).join('') + '</div>';
+}
 
         // Открытие модального окна
-        function openModal(index) {
-            currentEvent = allEvents[index];
-            const modal = document.getElementById('modal');
-            const content = document.getElementById('modal-content');
+      function openModal(index) {
+    currentEvent = allEvents[index];
+    const modal = document.getElementById('modal');
+    const content = document.getElementById('modal-content');
 
-            const isOpen = currentEvent.status === 'Открытый';
+    const isOpen = currentEvent.status === 'Открытый';
+    const isResident = currentEvent.residentStatus === 'Резидентский';
 
-            content.innerHTML = `
-                <div class="modal-header">${currentEvent.event}</div>
-                <div class="modal-info">
-                    <div class="modal-info-item">
-                        <strong>Дата:</strong>
-                        <span>${currentEvent.date}</span>
-                    </div>
-                    <div class="modal-info-item">
-                        <strong>Время начала:</strong>
-                        <span>${currentEvent.time}</span>
-                    </div>
-                    <div class="modal-info-item">
-                        <strong>Локация:</strong>
-                        <span>${currentEvent.location}</span>
-                    </div>
-                    <div class="modal-info-item">
-                        <strong>Стоимость:</strong>
-                        <span>${currentEvent.price}</span>
-                    </div>
-                    <div class="modal-info-item">
-                        <strong>Статус:</strong>
-                        <span>${currentEvent.status}</span>
-                    </div>
+    content.innerHTML = `
+        <div class="modal-header">${currentEvent.event}</div>
+        <div class="modal-info">
+            <div class="modal-info-item">
+                <strong>Дата:</strong>
+                <span>${currentEvent.date}</span>
+            </div>
+            <div class="modal-info-item">
+                <strong>Время начала:</strong>
+                <span>${currentEvent.time}</span>
+            </div>
+            <div class="modal-info-item">
+                <strong>Локация:</strong>
+                <span>${currentEvent.location}</span>
+            </div>
+            <div class="modal-info-item">
+                <strong>Стоимость:</strong>
+                <span>${currentEvent.price}</span>
+            </div>
+            <div class="modal-info-item">
+                <strong>Статус:</strong>
+                <span>${currentEvent.status}</span>
+            </div>
+            ${isResident ? `
+                <div class="modal-info-item" style="background: rgba(255, 193, 7, 0.2); border-color: rgba(255, 193, 7, 0.4);">
+                    <strong>🔒 Тип:</strong>
+                    <span style="color: #ffc107;">Только для резидентов</span>
                 </div>
-                
-                <button class="btn btn-secondary" onclick="showParticipants()" style="width: 100%; margin-bottom: 20px;">
-                    👥 Кто записался
-                </button>
-                
-                ${isOpen ? `
-                    <div class="input-group">
-                        <label for="telegram-input">Ваш Telegram</label>
-                        <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramSafeId()}">
-                    </div>
-                    <div class="input-group">
-                        <label for="nickname-input">Игровой никнейм</label>
-                        <input type="text" id="nickname-input" placeholder="Введите никнейм">
-                    </div>
-                    <div class="modal-buttons">
-                        <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-                        <button class="btn btn-primary" onclick="register()">Записаться</button>
-                    </div>
-                ` : `
-                    <div class="error-message">Регистрация на это мероприятие закрыта</div>
-                    <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 20px; width: 100%;">Закрыть</button>
-                `}
-            `;
+            ` : ''}
+        </div>
+        
+        <button class="btn btn-secondary" onclick="showParticipants()" style="width: 100%; margin-bottom: 20px;">
+            👥 Кто записался
+        </button>
+        
+        ${isOpen ? `
+            <div class="input-group">
+                <label for="telegram-input">Ваш Telegram</label>
+                <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramSafeId()}">
+            </div>
+            <div class="input-group">
+                <label for="nickname-input">Игровой никнейм</label>
+                <input type="text" id="nickname-input" placeholder="Введите никнейм">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="register()">Записаться</button>
+            </div>
+        ` : `
+            <div class="error-message">Регистрация на это мероприятие закрыта</div>
+            <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 20px; width: 100%;">Закрыть</button>
+        `}
+    `;
 
-            modal.classList.add('active');
-        }
+    modal.classList.add('active');
+}
 
         // Закрытие модального окна
         function closeModal() {
@@ -676,68 +691,85 @@
 
         // Регистрация на мероприятие
         async function register() {
-            const telegramInput = document.getElementById('telegram-input');
-            const nicknameInput = document.getElementById('nickname-input');
-            const telegram = telegramInput.value.trim();
-            const nickname = nicknameInput.value.trim();
+    const telegramInput = document.getElementById('telegram-input');
+    const nicknameInput = document.getElementById('nickname-input');
+    const telegram = telegramInput.value.trim();
+    const nickname = nicknameInput.value.trim();
 
-            if (!telegram) {
-                alert('Пожалуйста, введите ваш Telegram ник');
-                return;
-            }
+    if (!telegram) {
+        alert('Пожалуйста, введите ваш Telegram ник');
+        return;
+    }
 
-            if (!nickname) {
-                alert('Пожалуйста, введите ваш игровой никнейм');
-                return;
-            }
+    if (!nickname) {
+        alert('Пожалуйста, введите ваш игровой никнейм');
+        return;
+    }
 
-            const button = event.target;
-            button.disabled = true;
-            button.textContent = 'Отправка...';
+    const button = event.target;
+    button.disabled = true;
+    button.textContent = 'Отправка...';
 
-            try {
-                // ✅ ИЗМЕНЕНО: явный endpoint /register
-                const url = new URL(API_BASE + '/register');
-                url.searchParams.append('eventDateTime', `${currentEvent.dateShort} ${currentEvent.time}`);
-                url.searchParams.append('event', currentEvent.event);
-                url.searchParams.append('telegram', telegram);
-                url.searchParams.append('nickname', nickname);
-                url.searchParams.append('location', currentEvent.location);
-                
-                console.log('Регистрация:', url.toString());
+    try {
+        const url = new URL(API_BASE + '/register');
+        url.searchParams.append('eventDateTime', `${currentEvent.dateShort} ${currentEvent.time}`);
+        url.searchParams.append('event', currentEvent.event);
+        url.searchParams.append('telegram', telegram);
+        url.searchParams.append('nickname', nickname);
+        url.searchParams.append('location', currentEvent.location);
+        url.searchParams.append('residentStatus', currentEvent.residentStatus || '');
+        
+        console.log('Регистрация:', url.toString());
 
-                const response = await fetch(url);
-                const data = await response.json();
+        const response = await fetch(url);
+        const data = await response.json();
 
-                if (data.success) {
-                    document.getElementById('modal-content').innerHTML = `
-                        <div class="success-message">
-                            <div class="success-icon">✓</div>
-                            <div class="success-title">Вы успешно записаны!</div>
-                            <div class="success-details">
-                                <strong>${currentEvent.event}</strong><br>
-                                ${currentEvent.date}<br>
-                                Начало в ${currentEvent.time}<br>
-                                ${currentEvent.location}<br><br>
-                                Игрок: <strong>${nickname}</strong>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 24px; width: 100%;">
-                            Отлично!
-                        </button>
-                    `;
-                } else {
-                    alert('❌ Ошибка регистрации: ' + (data.error || 'Неизвестная ошибка'));
-                    button.disabled = false;
-                    button.textContent = 'Записаться';
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('❌ Ошибка соединения: ' + error.message);
-                button.disabled = false;
-                button.textContent = 'Записаться';
-            }
+        if (data.success) {
+            document.getElementById('modal-content').innerHTML = `
+                <div class="success-message">
+                    <div class="success-icon">✓</div>
+                    <div class="success-title">Вы успешно записаны!</div>
+                    <div class="success-details">
+                        <strong>${currentEvent.event}</strong><br>
+                        ${currentEvent.date}<br>
+                        Начало в ${currentEvent.time}<br>
+                        ${currentEvent.location}<br><br>
+                        Игрок: <strong>${nickname}</strong>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 24px; width: 100%;">
+                    Отлично!
+                </button>
+            `;
+        } else if (data.error === 'resident_only') {
+            document.getElementById('modal-content').innerHTML = `
+                <div class="modal-header">🔒 Доступ ограничен</div>
+                <div class="error-message">
+                    <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                    <div style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">
+                        Только для резидентов
+                    </div>
+                    <div style="font-size: 15px; line-height: 1.6;">
+                        Это мероприятие доступно только для резидентов клуба.<br><br>
+                        Для получения статуса резидента свяжитесь с администрацией.
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
+                    Назад
+                </button>
+            `;
+        } else {
+            alert('❌ Ошибка регистрации: ' + (data.message || data.error || 'Неизвестная ошибка'));
+            button.disabled = false;
+            button.textContent = 'Записаться';
         }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('❌ Ошибка соединения: ' + error.message);
+        button.disabled = false;
+        button.textContent = 'Записаться';
+    }
+}
 
         // Закрытие модального окна при клике вне его
         document.getElementById('modal').addEventListener('click', function(e) {
