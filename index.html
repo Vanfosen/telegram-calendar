@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Календарь мероприятий</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,73 +16,112 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #1a1410;
             color: #e5ddd5;
             padding: 0;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(139, 111, 71, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(201, 168, 124, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 16px;
+            padding: 24px 16px;
+            position: relative;
+            z-index: 1;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 24px;
-            padding: 24px 20px;
-            background: rgba(101, 67, 33, 0.25);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(139, 111, 71, 0.4);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            margin-bottom: 48px;
+            padding: 0;
+            animation: fadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .header h1 {
-            font-size: 26px;
-            margin-bottom: 8px;
-            color: #c9a87c;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(32px, 5vw, 48px);
             font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            color: #c9a87c;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            position: relative;
+            display: inline-block;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #8b6f47, transparent);
         }
 
         .header p {
-            font-size: 14px;
+            font-size: 15px;
             color: #e5ddd5;
-            opacity: 0.9;
+            opacity: 0.7;
             font-weight: 400;
-            letter-spacing: 0.5px;
+            margin-top: 20px;
+            letter-spacing: 0.02em;
         }
 
         .loading {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
             font-size: 16px;
             color: #c9a87c;
+            opacity: 0.6;
         }
 
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
             margin-bottom: 32px;
         }
 
         .event-card {
-            background: linear-gradient(135deg, rgba(101, 67, 33, 0.4), rgba(101, 67, 33, 0.2));
-            border-radius: 16px;
-            padding: 18px;
+            background: linear-gradient(135deg, rgba(101, 67, 33, 0.25), rgba(101, 67, 33, 0.1));
+            border-radius: 20px;
+            padding: 24px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1.5px solid rgba(139, 111, 71, 0.4);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(139, 111, 71, 0.2);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .event-card::before {
@@ -88,104 +130,119 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #c9a87c, #a0826d);
-            transform: scaleX(0);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            background: linear-gradient(135deg, rgba(201, 168, 124, 0.03), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
         }
 
         .event-card:hover::before {
-            transform: scaleX(1);
+            opacity: 1;
         }
 
         .event-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 32px rgba(160, 130, 109, 0.4);
-            border-color: #c9a87c;
-            background: linear-gradient(135deg, rgba(101, 67, 33, 0.5), rgba(101, 67, 33, 0.3));
+            transform: translateY(-8px);
+            border-color: rgba(139, 111, 71, 0.4);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(201, 168, 124, 0.1);
+        }
+
+        .event-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 12px;
         }
 
         .event-date-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #8b6f47, #a0826d);
-            color: #1a1410;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
+            font-family: 'Outfit', sans-serif;
+            background: rgba(139, 111, 71, 0.25);
+            color: #c9a87c;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 13px;
             font-weight: 700;
-            margin-bottom: 10px;
-            box-shadow: 0 3px 10px rgba(139, 111, 71, 0.4);
-            letter-spacing: 0.3px;
+            border: 1px solid rgba(139, 111, 71, 0.3);
+            letter-spacing: 0.02em;
+            white-space: nowrap;
         }
 
         .resident-badge {
-            display: inline-block;
-            background: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
-            padding: 4px 10px;
-            border-radius: 16px;
+            background: rgba(201, 168, 124, 0.15);
+            color: #c9a87c;
+            padding: 6px 14px;
+            border-radius: 100px;
             font-size: 11px;
             font-weight: 700;
-            margin-bottom: 8px;
-            border: 1.5px solid rgba(255, 193, 7, 0.4);
-            margin-left: 6px;
+            border: 1px solid rgba(201, 168, 124, 0.25);
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .event-name {
-            font-size: 18px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
             font-weight: 700;
-            margin-bottom: 12px;
-            color: #c9a87c;
+            margin-bottom: 20px;
+            color: #e5ddd5;
             line-height: 1.3;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            letter-spacing: -0.01em;
         }
 
         .event-details {
-            font-size: 13px;
-            color: #e5ddd5;
-            line-height: 1.6;
-            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .event-detail-item {
             display: flex;
             align-items: center;
-            margin-bottom: 6px;
-            padding: 4px 0;
+            gap: 12px;
+            font-size: 14px;
+            color: #e5ddd5;
+            opacity: 0.85;
         }
 
-        .event-detail-item span:first-child {
-            margin-right: 8px;
+        .event-detail-item .icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 16px;
-            filter: grayscale(20%);
-        }
-
-        .event-detail-item span:last-child {
-            color: #ffffff;
-            font-weight: 500;
+            opacity: 0.6;
         }
 
         .event-status {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 12px;
             font-weight: 700;
-            margin-top: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            letter-spacing: 0.3px;
+            letter-spacing: 0.03em;
+            margin-top: 4px;
         }
 
         .status-open {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.25), rgba(56, 142, 60, 0.25));
+            background: rgba(129, 199, 132, 0.15);
             color: #81c784;
-            border: 1.5px solid rgba(129, 199, 132, 0.4);
+            border: 1px solid rgba(129, 199, 132, 0.25);
         }
 
         .status-closed {
-            background: linear-gradient(135deg, rgba(244, 67, 54, 0.25), rgba(211, 47, 47, 0.25));
+            background: rgba(239, 154, 154, 0.15);
             color: #ef9a9a;
-            border: 1.5px solid rgba(239, 154, 154, 0.4);
+            border: 1px solid rgba(239, 154, 154, 0.25);
         }
 
         .modal {
@@ -195,34 +252,46 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(26, 20, 16, 0.92);
+            background: rgba(26, 20, 16, 0.95);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
+            padding: 20px;
         }
 
         .modal.active {
             display: flex;
+            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
         .modal-content {
-            background: #1a1410;
+            background: linear-gradient(135deg, rgba(101, 67, 33, 0.3), rgba(101, 67, 33, 0.15));
             border-radius: 24px;
-            padding: 24px;
-            max-width: 90%;
-            max-height: 85%;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
             overflow-y: auto;
             position: relative;
-            border: 2px solid rgba(139, 111, 71, 0.5);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-            animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(139, 111, 71, 0.3);
+            backdrop-filter: blur(20px);
+            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(30px) scale(0.95);
+                transform: translateY(40px) scale(0.96);
             }
             to {
                 opacity: 1;
@@ -231,262 +300,267 @@
         }
 
         .modal-header {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 28px;
             color: #c9a87c;
-            border-bottom: 2px solid rgba(139, 111, 71, 0.4);
-            padding-bottom: 12px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            line-height: 1.2;
+            letter-spacing: -0.01em;
         }
 
         .modal-info {
-            margin-bottom: 20px;
-            line-height: 1.8;
+            margin-bottom: 24px;
         }
 
         .modal-info-item {
             display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: rgba(101, 67, 33, 0.3);
-            border-radius: 10px;
-            border: 1px solid rgba(139, 111, 71, 0.2);
+            align-items: flex-start;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(139, 111, 71, 0.15);
             transition: all 0.2s ease;
         }
 
+        .modal-info-item:last-child {
+            border-bottom: none;
+        }
+
         .modal-info-item:hover {
-            background: rgba(101, 67, 33, 0.4);
-            border-color: rgba(139, 111, 71, 0.4);
+            padding-left: 8px;
         }
 
         .modal-info-item strong {
-            color: #c9a87c;
-            min-width: 120px;
+            color: #8b6f47;
+            min-width: 100px;
             font-size: 13px;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.8;
         }
 
         .modal-info-item span {
-            color: #ffffff;
-            font-size: 13px;
+            color: #e5ddd5;
+            font-size: 14px;
             font-weight: 500;
+            flex: 1;
         }
 
         .modal-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            margin-top: 24px;
         }
 
         .btn {
             flex: 1;
-            padding: 14px;
+            padding: 16px 24px;
             border: none;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            letter-spacing: 0.3px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            letter-spacing: 0.02em;
+            font-family: 'Outfit', sans-serif;
         }
 
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #c9a87c, #a0826d);
             color: #1a1410;
+            box-shadow: 0 4px 16px rgba(201, 168, 124, 0.3);
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: linear-gradient(135deg, #d4b890, #b49381);
+            box-shadow: 0 6px 24px rgba(201, 168, 124, 0.4);
         }
 
         .btn-secondary {
-            background: rgba(101, 67, 33, 0.5);
+            background: rgba(101, 67, 33, 0.3);
             color: #e5ddd5;
-            border: 1.5px solid rgba(139, 111, 71, 0.5);
+            border: 1px solid rgba(139, 111, 71, 0.4);
         }
 
-        .btn-secondary:hover {
-            background: rgba(139, 111, 71, 0.6);
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(139, 111, 71, 0.4);
             border-color: #8b6f47;
         }
 
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
             transform: none;
         }
 
         .input-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 700;
-            color: #c9a87c;
+            color: #8b6f47;
             font-size: 13px;
-            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid rgba(139, 111, 71, 0.4);
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 14px 16px;
+            border: 1px solid rgba(139, 111, 71, 0.3);
+            border-radius: 12px;
+            font-size: 15px;
             background: rgba(101, 67, 33, 0.2);
-            color: #ffffff;
+            color: #e5ddd5;
             transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
             font-weight: 500;
         }
 
         .input-group input:focus {
             outline: none;
             border-color: #c9a87c;
-            background: rgba(101, 67, 33, 0.35);
-            box-shadow: 0 0 0 3px rgba(201, 168, 124, 0.15);
+            background: rgba(101, 67, 33, 0.3);
+            box-shadow: 0 0 0 3px rgba(201, 168, 124, 0.1);
         }
 
         .input-group input::placeholder {
-            color: rgba(229, 221, 213, 0.4);
+            color: rgba(229, 221, 213, 0.3);
         }
 
         .success-message {
             text-align: center;
-            color: #81c784;
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(56, 142, 60, 0.15));
-            padding: 24px;
+            padding: 32px;
             border-radius: 16px;
-            margin-top: 12px;
-            border: 2px solid rgba(129, 199, 132, 0.3);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, rgba(129, 199, 132, 0.15), rgba(129, 199, 132, 0.05));
+            border: 1px solid rgba(129, 199, 132, 0.2);
         }
 
         .success-icon {
-            font-size: 60px;
-            margin-bottom: 16px;
-            animation: successPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            font-weight: 300;
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: inline-block;
         }
 
         @keyframes successPop {
             0% {
                 transform: scale(0) rotate(-180deg);
+                opacity: 0;
             }
             50% {
-                transform: scale(1.2) rotate(10deg);
+                transform: scale(1.1) rotate(10deg);
             }
             100% {
                 transform: scale(1) rotate(0);
+                opacity: 1;
             }
         }
 
         .success-title {
-            font-size: 20px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 10px;
-            color: #a5d6a7;
+            margin-bottom: 16px;
+            color: #81c784;
         }
 
         .success-details {
             font-size: 14px;
-            opacity: 0.9;
-            margin-top: 8px;
             color: #e5ddd5;
-            line-height: 1.6;
+            opacity: 0.8;
+            line-height: 1.8;
         }
 
         .error-message {
             text-align: center;
             color: #ef9a9a;
-            background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(211, 47, 47, 0.15));
-            padding: 20px;
+            background: linear-gradient(135deg, rgba(239, 154, 154, 0.15), rgba(239, 154, 154, 0.05));
+            padding: 28px;
             border-radius: 16px;
-            margin-top: 12px;
-            border: 2px solid rgba(239, 154, 154, 0.3);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(239, 154, 154, 0.2);
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
-            color: #c9a87c;
+            padding: 60px 20px;
+            color: #8b6f47;
+            opacity: 0.6;
         }
 
         .empty-state-icon {
-            font-size: 60px;
-            margin-bottom: 16px;
-            opacity: 0.5;
+            font-size: 72px;
+            margin-bottom: 20px;
+            opacity: 0.4;
         }
 
         ::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
         }
 
         ::-webkit-scrollbar-track {
             background: rgba(26, 20, 16, 0.5);
-            border-radius: 8px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #8b6f47, #a0826d);
-            border-radius: 8px;
+            background: rgba(139, 111, 71, 0.4);
+            border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #c9a87c, #8b6f47);
+            background: rgba(139, 111, 71, 0.6);
         }
 
         @media (max-width: 768px) {
             .container {
-                padding: 12px;
+                padding: 20px 12px;
             }
 
             .calendar-grid {
                 grid-template-columns: 1fr;
-                gap: 12px;
+                gap: 16px;
             }
 
             .header {
-                padding: 20px 16px;
-                margin-bottom: 20px;
+                margin-bottom: 32px;
             }
 
             .header h1 {
-                font-size: 22px;
-                margin-bottom: 6px;
-            }
-
-            .header p {
-                font-size: 13px;
+                font-size: 36px;
             }
 
             .modal-content {
-                padding: 20px;
+                padding: 24px;
                 max-width: 95%;
             }
 
             .modal-header {
-                font-size: 20px;
-                margin-bottom: 16px;
-                padding-bottom: 10px;
+                font-size: 24px;
+                margin-bottom: 20px;
             }
 
-            .modal-info-item strong {
-                min-width: 100px;
-                font-size: 12px;
+            .event-card-top {
+                flex-wrap: wrap;
             }
+        }
 
-            .modal-info-item span {
-                font-size: 12px;
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
@@ -553,25 +627,28 @@
                 
                 return `
                 <div class="event-card" onclick="openModal(${index})">
-                    <div class="event-date-badge">${event.date}</div>
-                    ${isResident ? '<span class="resident-badge">🔒 Предварительная</span>' : ''}
+                    <div class="event-card-top">
+                        <div class="event-date-badge">${event.date}</div>
+                        ${isResident ? '<div class="resident-badge"><span>🔒</span>Резиденты</div>' : ''}
+                    </div>
                     <div class="event-name">${event.event}</div>
                     <div class="event-details">
                         <div class="event-detail-item">
-                            <span>🕐</span>
+                            <span class="icon">🕐</span>
                             <span>${event.time}</span>
                         </div>
                         <div class="event-detail-item">
-                            <span>📍</span>
+                            <span class="icon">📍</span>
                             <span>${event.location}</span>
                         </div>
                         <div class="event-detail-item">
-                            <span>💰</span>
+                            <span class="icon">💰</span>
                             <span>${event.price}</span>
                         </div>
                     </div>
                     <span class="event-status ${event.status === 'Открытый' ? 'status-open' : 'status-closed'}">
-                        ${event.status === 'Открытый' ? '✓ Открыта' : '✕ Закрыта'}
+                        <span>${event.status === 'Открытый' ? '✓' : '✕'}</span>
+                        ${event.status === 'Открытый' ? 'Открыта' : 'Закрыта'}
                     </span>
                 </div>
             `}).join('') + '</div>';
@@ -589,45 +666,45 @@
                 <div class="modal-header">${currentEvent.event}</div>
                 <div class="modal-info">
                     <div class="modal-info-item">
-                        <strong>Дата:</strong>
+                        <strong>Дата</strong>
                         <span>${currentEvent.date}</span>
                     </div>
                     <div class="modal-info-item">
-                        <strong>Время:</strong>
+                        <strong>Время</strong>
                         <span>${currentEvent.time}</span>
                     </div>
                     <div class="modal-info-item">
-                        <strong>Локация:</strong>
+                        <strong>Место</strong>
                         <span>${currentEvent.location}</span>
                     </div>
                     <div class="modal-info-item">
-                        <strong>Стоимость:</strong>
+                        <strong>Стоимость</strong>
                         <span>${currentEvent.price}</span>
                     </div>
                     <div class="modal-info-item">
-                        <strong>Статус:</strong>
+                        <strong>Статус</strong>
                         <span>${currentEvent.status}</span>
                     </div>
                     ${isResident ? `
-                        <div class="modal-info-item" style="background: rgba(255, 193, 7, 0.2); border-color: rgba(255, 193, 7, 0.4);">
-                            <strong>🔒 Тип:</strong>
-                            <span style="color: #ffc107;">Предварительная запись доступна резидентам</span>
+                        <div class="modal-info-item" style="background: rgba(201, 168, 124, 0.1); padding: 14px; border-radius: 12px; margin-top: 12px; border: 1px solid rgba(201, 168, 124, 0.2);">
+                            <strong>Тип</strong>
+                            <span style="color: #c9a87c;">🔒 Только для резидентов</span>
                         </div>
                     ` : ''}
                 </div>
                 
-                <button class="btn btn-secondary" onclick="showParticipants()" style="width: 100%; margin-bottom: 16px;">
-                    👥 Кто записан
+                <button class="btn btn-secondary" onclick="showParticipants()" style="width: 100%; margin-bottom: 20px;">
+                    👥 Список участников
                 </button>
                 
                 ${isOpen ? `
                     <div class="input-group">
-                        <label for="telegram-input">Ваш Telegram</label>
+                        <label for="telegram-input">Telegram</label>
                         <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramSafeId()}">
                     </div>
                     ${!isResident ? `
                         <div class="input-group">
-                            <label for="nickname-input">Игровой никнейм</label>
+                            <label for="nickname-input">Игровой ник</label>
                             <input type="text" id="nickname-input" placeholder="Введите никнейм">
                         </div>
                     ` : ''}
@@ -636,8 +713,11 @@
                         <button class="btn btn-primary" onclick="register()">Записаться</button>
                     </div>
                 ` : `
-                    <div class="error-message">Регистрация закрыта</div>
-                    <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 16px; width: 100%;">Закрыть</button>
+                    <div class="error-message" style="margin-top: 20px;">
+                        <div style="font-size: 48px; margin-bottom: 12px;">🔒</div>
+                        <div style="font-size: 16px; font-weight: 700;">Регистрация закрыта</div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 20px; width: 100%;">Закрыть</button>
                 `}
             `;
 
@@ -673,20 +753,20 @@
                 if (data.success && data.participants?.length > 0) {
                     const participantsList = data.participants.map((p, idx) => `
                         <div class="modal-info-item">
-                            <strong>${idx + 1}.</strong>
+                            <strong>${idx + 1}</strong>
                             <span>${p.nickname}${p.confirmation ? ' — ' + p.confirmation : ''}</span>
                         </div>
                     `).join('');
                     
                     content.innerHTML = `
                         <div class="modal-header">Участники мероприятия</div>
-                        <div style="margin-bottom: 16px; color: #c9a87c; font-size: 14px;">
-                            Всего: <strong>${data.count}</strong>
+                        <div style="margin-bottom: 20px; color: #c9a87c; font-size: 14px; font-weight: 700;">
+                            Всего участников: ${data.count}
                         </div>
                         <div class="modal-info">
                             ${participantsList}
                         </div>
-                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 16px; width: 100%;">
+                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
                             Назад
                         </button>
                     `;
@@ -697,7 +777,7 @@
                             <div class="empty-state-icon">👥</div>
                             <p>Пока никто не записался</p>
                         </div>
-                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 16px; width: 100%;">
+                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
                             Назад
                         </button>
                     `;
@@ -706,8 +786,11 @@
                 console.error('Ошибка загрузки участников:', error);
                 content.innerHTML = `
                     <div class="modal-header">Ошибка</div>
-                    <div class="error-message">Не удалось загрузить список</div>
-                    <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 16px; width: 100%;">
+                    <div class="error-message">
+                        <div style="font-size: 48px; margin-bottom: 12px;">⚠️</div>
+                        <div style="font-size: 16px; font-weight: 700;">Не удалось загрузить список</div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
                         Назад
                     </button>
                 `;
@@ -766,7 +849,7 @@
                                 ${currentEvent.location}
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 20px; width: 100%;">
+                        <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 24px; width: 100%;">
                             Отлично!
                         </button>
                     `;
@@ -774,16 +857,16 @@
                     document.getElementById('modal-content').innerHTML = `
                         <div class="modal-header">🔒 Доступ ограничен</div>
                         <div class="error-message">
-                            <div style="font-size: 40px; margin-bottom: 12px;">⚠️</div>
-                            <div style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">
+                            <div style="font-size: 56px; margin-bottom: 16px;">⚠️</div>
+                            <div style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">
                                 Только для резидентов
                             </div>
-                            <div style="font-size: 13px; line-height: 1.6;">
+                            <div style="font-size: 14px; line-height: 1.8; opacity: 0.9;">
                                 Предварительная запись доступна только для резидентов клуба.<br><br>
                                 Для получения статуса свяжитесь с администрацией.
                             </div>
                         </div>
-                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 20px; width: 100%;">
+                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
                             Назад
                         </button>
                     `;
