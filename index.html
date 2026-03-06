@@ -1,895 +1,584 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Календарь мероприятий</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #1a1410;
-            color: #e5ddd5;
-            padding: 0;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(139, 111, 71, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(201, 168, 124, 0.06) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px 16px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 48px;
-            padding: 0;
-            animation: fadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(32px, 5vw, 48px);
-            font-weight: 800;
-            color: #c9a87c;
-            margin-bottom: 12px;
-            letter-spacing: -0.02em;
-            line-height: 1.1;
-            position: relative;
-            display: inline-block;
-        }
-
-        .header h1::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #8b6f47, transparent);
-        }
-
-        .header p {
-            font-size: 15px;
-            color: #e5ddd5;
-            opacity: 0.7;
-            font-weight: 400;
-            margin-top: 20px;
-            letter-spacing: 0.02em;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-            font-size: 16px;
-            color: #c9a87c;
-            opacity: 0.6;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .event-card {
-            background: linear-gradient(135deg, rgba(101, 67, 33, 0.25), rgba(101, 67, 33, 0.1));
-            border-radius: 20px;
-            padding: 24px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid rgba(139, 111, 71, 0.2);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .event-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(201, 168, 124, 0.03), transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .event-card:hover::before {
-            opacity: 1;
-        }
-
-        .event-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(139, 111, 71, 0.4);
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(201, 168, 124, 0.1);
-        }
-
-        .event-card-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            gap: 12px;
-        }
-
-        .event-date-badge {
-            font-family: 'Outfit', sans-serif;
-            background: rgba(139, 111, 71, 0.25);
-            color: #c9a87c;
-            padding: 8px 16px;
-            border-radius: 100px;
-            font-size: 13px;
-            font-weight: 700;
-            border: 1px solid rgba(139, 111, 71, 0.3);
-            letter-spacing: 0.02em;
-            white-space: nowrap;
-        }
-
-        .resident-badge {
-            background: rgba(201, 168, 124, 0.15);
-            color: #c9a87c;
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid rgba(201, 168, 124, 0.25);
-            letter-spacing: 0.03em;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .event-name {
-            font-family: 'Outfit', sans-serif;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #e5ddd5;
-            line-height: 1.3;
-            letter-spacing: -0.01em;
-        }
-
-        .event-details {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .event-detail-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-            color: #e5ddd5;
-            opacity: 0.85;
-        }
-
-        .event-detail-item .icon {
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            opacity: 0.6;
-        }
-
-        .event-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 100px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-            margin-top: 4px;
-        }
-
-        .status-open {
-            background: rgba(129, 199, 132, 0.15);
-            color: #81c784;
-            border: 1px solid rgba(129, 199, 132, 0.25);
-        }
-
-        .status-closed {
-            background: rgba(239, 154, 154, 0.15);
-            color: #ef9a9a;
-            border: 1px solid rgba(239, 154, 154, 0.25);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(26, 20, 16, 0.95);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(12px);
-            padding: 20px;
-        }
-
-        .modal.active {
-            display: flex;
-            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, rgba(101, 67, 33, 0.3), rgba(101, 67, 33, 0.15));
-            border-radius: 24px;
-            padding: 32px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-            position: relative;
-            border: 1px solid rgba(139, 111, 71, 0.3);
-            backdrop-filter: blur(20px);
-            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(40px) scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .modal-header {
-            font-family: 'Outfit', sans-serif;
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 28px;
-            color: #c9a87c;
-            line-height: 1.2;
-            letter-spacing: -0.01em;
-        }
-
-        .modal-info {
-            margin-bottom: 24px;
-        }
-
-        .modal-info-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(139, 111, 71, 0.15);
-            transition: all 0.2s ease;
-        }
-
-        .modal-info-item:last-child {
-            border-bottom: none;
-        }
-
-        .modal-info-item:hover {
-            padding-left: 8px;
-        }
-
-        .modal-info-item strong {
-            color: #8b6f47;
-            min-width: 100px;
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            opacity: 0.8;
-        }
-
-        .modal-info-item span {
-            color: #e5ddd5;
-            font-size: 14px;
-            font-weight: 500;
-            flex: 1;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 16px 24px;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            letter-spacing: 0.02em;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-        }
-
-        .btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #c9a87c, #a0826d);
-            color: #1a1410;
-            box-shadow: 0 4px 16px rgba(201, 168, 124, 0.3);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: linear-gradient(135deg, #d4b890, #b49381);
-            box-shadow: 0 6px 24px rgba(201, 168, 124, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(101, 67, 33, 0.3);
-            color: #e5ddd5;
-            border: 1px solid rgba(139, 111, 71, 0.4);
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            background: rgba(139, 111, 71, 0.4);
-            border-color: #8b6f47;
-        }
-
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 700;
-            color: #8b6f47;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid rgba(139, 111, 71, 0.3);
-            border-radius: 12px;
-            font-size: 15px;
-            background: rgba(101, 67, 33, 0.2);
-            color: #e5ddd5;
-            transition: all 0.3s ease;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 500;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #c9a87c;
-            background: rgba(101, 67, 33, 0.3);
-            box-shadow: 0 0 0 3px rgba(201, 168, 124, 0.1);
-        }
-
-        .input-group input::placeholder {
-            color: rgba(229, 221, 213, 0.3);
-        }
-
-        .success-message {
-            text-align: center;
-            padding: 32px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(129, 199, 132, 0.15), rgba(129, 199, 132, 0.05));
-            border: 1px solid rgba(129, 199, 132, 0.2);
-        }
-
-        .success-icon {
-            font-size: 72px;
-            margin-bottom: 20px;
-            animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            display: inline-block;
-        }
-
-        @keyframes successPop {
-            0% {
-                transform: scale(0) rotate(-180deg);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.1) rotate(10deg);
-            }
-            100% {
-                transform: scale(1) rotate(0);
-                opacity: 1;
-            }
-        }
-
-        .success-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: #81c784;
-        }
-
-        .success-details {
-            font-size: 14px;
-            color: #e5ddd5;
-            opacity: 0.8;
-            line-height: 1.8;
-        }
-
-        .error-message {
-            text-align: center;
-            color: #ef9a9a;
-            background: linear-gradient(135deg, rgba(239, 154, 154, 0.15), rgba(239, 154, 154, 0.05));
-            padding: 28px;
-            border-radius: 16px;
-            border: 1px solid rgba(239, 154, 154, 0.2);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #8b6f47;
-            opacity: 0.6;
-        }
-
-        .empty-state-icon {
-            font-size: 72px;
-            margin-bottom: 20px;
-            opacity: 0.4;
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(26, 20, 16, 0.5);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(139, 111, 71, 0.4);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(139, 111, 71, 0.6);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 12px;
-            }
-
-            .calendar-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .header {
-                margin-bottom: 32px;
-            }
-
-            .header h1 {
-                font-size: 36px;
-            }
-
-            .modal-content {
-                padding: 24px;
-                max-width: 95%;
-            }
-
-            .modal-header {
-                font-size: 24px;
-                margin-bottom: 20px;
-            }
-
-            .event-card-top {
-                flex-wrap: wrap;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Календарь мероприятий</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--gold:#c9a87c;
+--gold2:#e2c49a;
+--text:#efe5da;
+--soft:rgba(239,229,218,0.7);
+
+--green:#81c784;
+--red:#ef9a9a;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Outfit',sans-serif;
+
+background:
+radial-gradient(circle at 20% 30%, rgba(201,168,124,0.08), transparent 30%),
+radial-gradient(circle at 80% 70%, rgba(139,111,71,0.08), transparent 30%),
+linear-gradient(180deg,#1a1410,#140f0c);
+
+color:var(--text);
+min-height:100vh;
+overflow-x:hidden;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:24px 16px 40px;
+}
+
+.hero{
+margin-bottom:30px;
+}
+
+.hero-title-shell{
+
+max-width:700px;
+margin:auto;
+
+padding:26px 22px;
+border-radius:26px;
+
+text-align:center;
+
+background:
+linear-gradient(180deg,rgba(54,38,24,0.75),rgba(24,18,14,0.9)),
+radial-gradient(circle at top,rgba(201,168,124,0.12),transparent);
+
+border:1px solid rgba(201,168,124,0.15);
+
+box-shadow:
+0 18px 40px rgba(0,0,0,0.35),
+inset 0 1px 0 rgba(255,255,255,0.03);
+
+backdrop-filter:blur(14px);
+}
+
+.hero h1{
+font-size:clamp(30px,5vw,44px);
+font-weight:800;
+letter-spacing:-0.03em;
+color:var(--gold2);
+}
+
+.loading{
+text-align:center;
+padding:50px;
+color:var(--gold);
+font-size:16px;
+}
+
+.calendar-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+gap:20px;
+}
+
+.event-card{
+
+background:
+linear-gradient(180deg,rgba(73,51,30,0.35),rgba(43,30,19,0.4));
+
+border:1px solid rgba(201,168,124,0.18);
+
+border-radius:20px;
+
+padding:18px;
+
+cursor:pointer;
+
+transition:0.25s;
+
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+}
+
+.event-card:hover{
+transform:translateY(-5px);
+border-color:rgba(201,168,124,0.35);
+box-shadow:0 18px 34px rgba(0,0,0,0.35);
+}
+
+.event-card-top{
+display:flex;
+justify-content:space-between;
+margin-bottom:14px;
+}
+
+.event-date{
+background:rgba(201,168,124,0.12);
+color:var(--gold2);
+padding:6px 12px;
+border-radius:100px;
+font-size:12px;
+font-weight:700;
+}
+
+.resident{
+background:rgba(201,168,124,0.08);
+padding:6px 12px;
+border-radius:100px;
+font-size:11px;
+border:1px solid rgba(201,168,124,0.2);
+}
+
+.event-name{
+font-size:22px;
+font-weight:800;
+margin-bottom:14px;
+}
+
+.event-details{
+display:flex;
+flex-direction:column;
+gap:8px;
+color:var(--soft);
+font-size:14px;
+margin-bottom:12px;
+}
+
+.event-footer{
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-top:1px solid rgba(201,168,124,0.1);
+padding-top:12px;
+}
+
+.status{
+font-size:12px;
+padding:6px 12px;
+border-radius:100px;
+font-weight:700;
+}
+
+.status-open{
+background:rgba(129,199,132,0.15);
+color:var(--green);
+}
+
+.status-closed{
+background:rgba(239,154,154,0.15);
+color:var(--red);
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+z-index:1000;
+align-items:center;
+justify-content:center;
+padding:20px;
+}
+
+.modal.active{
+display:flex;
+}
+
+.modal-content{
+
+background:
+linear-gradient(180deg,rgba(74,51,30,0.4),rgba(38,26,17,0.85));
+
+border-radius:24px;
+border:1px solid rgba(201,168,124,0.2);
+
+padding:26px;
+
+width:100%;
+max-width:520px;
+max-height:90vh;
+
+overflow-y:auto;
+}
+
+.modal-header{
+font-size:28px;
+font-weight:800;
+color:var(--gold2);
+margin-bottom:18px;
+}
+
+.modal-info{
+margin-bottom:18px;
+}
+
+.modal-row{
+display:flex;
+gap:10px;
+padding:10px 0;
+border-bottom:1px solid rgba(201,168,124,0.08);
+}
+
+.modal-row strong{
+min-width:90px;
+color:var(--gold);
+font-size:12px;
+}
+
+.modal-row span{
+font-size:14px;
+}
+
+.input-group{
+margin-bottom:16px;
+}
+
+.input-group label{
+display:block;
+font-size:12px;
+color:var(--gold);
+margin-bottom:6px;
+}
+
+.input-group input{
+
+width:100%;
+
+padding:12px 14px;
+
+border-radius:12px;
+
+border:1px solid rgba(201,168,124,0.18);
+
+background:rgba(255,255,255,0.03);
+
+color:var(--text);
+}
+
+.modal-buttons{
+display:flex;
+gap:10px;
+}
+
+.btn{
+
+flex:1;
+
+padding:14px;
+
+border:none;
+
+border-radius:12px;
+
+font-weight:700;
+
+cursor:pointer;
+}
+
+.btn-primary{
+background:linear-gradient(135deg,var(--gold2),#ae8d66);
+color:#1b140f;
+}
+
+.btn-secondary{
+background:rgba(255,255,255,0.04);
+color:white;
+border:1px solid rgba(201,168,124,0.2);
+}
+
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Календарь Турниров</h1>
-            <p>Выберите мероприятие и запишитесь на игру</p>
-        </div>
 
-        <div id="events-container">
-            <div class="loading">⏳ Загрузка мероприятий...</div>
-        </div>
-    </div>
+<div class="container">
 
-    <div id="modal" class="modal">
-        <div class="modal-content" id="modal-content"></div>
-    </div>
+<div class="hero">
+<div class="hero-title-shell">
+<h1>Календарь игр</h1>
+</div>
+</div>
 
-    <script>
-        const API_BASE = 'https://delicate-wind-a87d.vanfossengame.workers.dev';
+<div id="events-container">
+<div class="loading">⏳ Загрузка мероприятий...</div>
+</div>
 
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+</div>
 
-        let currentEvent = null;
-        let allEvents = [];
+<div id="modal" class="modal">
+<div class="modal-content" id="modal-content"></div>
+</div>
 
-        async function loadEvents() {
-            try {
-                console.log('Запрос к:', API_BASE + '/events');
-                const response = await fetch(API_BASE + '/events');
-                console.log('Статус:', response.status);
-                
-                const data = await response.json();
-                console.log('Данные:', data);
+<script>
 
-                if (data.success && data.events?.length > 0) {
-                    allEvents = data.events;
-                    displayEvents(allEvents);
-                } else {
-                    document.getElementById('events-container').innerHTML = 
-                        '<div class="empty-state"><div class="empty-state-icon">📅</div><p>Нет доступных мероприятий</p></div>';
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки:', error);
-                document.getElementById('events-container').innerHTML = 
-                    `<div class="error-message">❌ Ошибка подключения: ${error.message}</div>`;
-            }
-        }
+const API_BASE='https://delicate-wind-a87d.vanfossengame.workers.dev';
 
-        function displayEvents(events) {
-            const container = document.getElementById('events-container');
-            
-            if (events.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><p>Нет доступных мероприятий</p></div>';
-                return;
-            }
+let tg=window.Telegram.WebApp;
+tg.expand();
+tg.ready();
 
-            container.innerHTML = '<div class="calendar-grid">' + events.map((event, index) => {
-                const isResident = event.residentStatus === 'Резидентский';
-                
-                return `
-                <div class="event-card" onclick="openModal(${index})">
-                    <div class="event-card-top">
-                        <div class="event-date-badge">${event.date}</div>
-                        ${isResident ? '<div class="resident-badge"><span>🔒</span>Резиденты</div>' : ''}
-                    </div>
-                    <div class="event-name">${event.event}</div>
-                    <div class="event-details">
-                        <div class="event-detail-item">
-                            <span class="icon">🕐</span>
-                            <span>${event.time}</span>
-                        </div>
-                        <div class="event-detail-item">
-                            <span class="icon">📍</span>
-                            <span>${event.location}</span>
-                        </div>
-                        <div class="event-detail-item">
-                            <span class="icon">💰</span>
-                            <span>${event.price}</span>
-                        </div>
-                    </div>
-                    <span class="event-status ${event.status === 'Открытый' ? 'status-open' : 'status-closed'}">
-                        <span>${event.status === 'Открытый' ? '✓' : '✕'}</span>
-                        ${event.status === 'Открытый' ? 'Открыта' : 'Закрыта'}
-                    </span>
-                </div>
-            `}).join('') + '</div>';
-        }
+let currentEvent=null;
+let allEvents=[];
 
-        function openModal(index) {
-            currentEvent = allEvents[index];
-            const modal = document.getElementById('modal');
-            const content = document.getElementById('modal-content');
+async function loadEvents(){
 
-            const isOpen = currentEvent.status === 'Открытый';
-            const isResident = currentEvent.residentStatus === 'Резидентский';
+try{
 
-            content.innerHTML = `
-                <div class="modal-header">${currentEvent.event}</div>
-                <div class="modal-info">
-                    <div class="modal-info-item">
-                        <strong>Дата</strong>
-                        <span>${currentEvent.date}</span>
-                    </div>
-                    <div class="modal-info-item">
-                        <strong>Время</strong>
-                        <span>${currentEvent.time}</span>
-                    </div>
-                    <div class="modal-info-item">
-                        <strong>Место</strong>
-                        <span>${currentEvent.location}</span>
-                    </div>
-                    <div class="modal-info-item">
-                        <strong>Стоимость</strong>
-                        <span>${currentEvent.price}</span>
-                    </div>
-                    <div class="modal-info-item">
-                        <strong>Статус</strong>
-                        <span>${currentEvent.status}</span>
-                    </div>
-                    ${isResident ? `
-                        <div class="modal-info-item" style="background: rgba(201, 168, 124, 0.1); padding: 14px; border-radius: 12px; margin-top: 12px; border: 1px solid rgba(201, 168, 124, 0.2);">
-                            <strong>Тип</strong>
-                            <span style="color: #c9a87c;">🔒 Только для резидентов</span>
-                        </div>
-                    ` : ''}
-                </div>
-                
-                <button class="btn btn-secondary" onclick="showParticipants()" style="width: 100%; margin-bottom: 20px;">
-                    👥 Список участников
-                </button>
-                
-                ${isOpen ? `
-                    <div class="input-group">
-                        <label for="telegram-input">Telegram</label>
-                        <input type="text" id="telegram-input" placeholder="@username" value="${getTelegramSafeId()}">
-                    </div>
-                    ${!isResident ? `
-                        <div class="input-group">
-                            <label for="nickname-input">Игровой ник</label>
-                            <input type="text" id="nickname-input" placeholder="Введите никнейм">
-                        </div>
-                    ` : ''}
-                    <div class="modal-buttons">
-                        <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-                        <button class="btn btn-primary" onclick="register()">Записаться</button>
-                    </div>
-                ` : `
-                    <div class="error-message" style="margin-top: 20px;">
-                        <div style="font-size: 48px; margin-bottom: 12px;">🔒</div>
-                        <div style="font-size: 16px; font-weight: 700;">Регистрация закрыта</div>
-                    </div>
-                    <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 20px; width: 100%;">Закрыть</button>
-                `}
-            `;
+const response=await fetch(API_BASE+'/events');
+const data=await response.json();
 
-            modal.classList.add('active');
-        }
+if(data.success && data.events?.length>0){
 
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
+allEvents=data.events;
+displayEvents(allEvents);
 
-        function getTelegramSafeId() {
-            const user = tg.initDataUnsafe?.user;
-            if (!user) return '';
-            return user.username ? '@' + user.username : 'id' + user.id;
-        }
+}else{
 
-        async function showParticipants() {
-            const content = document.getElementById('modal-content');
-            
-            content.innerHTML = `
-                <div class="modal-header">Участники</div>
-                <div class="loading">Загрузка...</div>
-            `;
-            
-            try {
-                const url = new URL(API_BASE + '/participants');
-                url.searchParams.append('eventDate', currentEvent.dateShort);
-                url.searchParams.append('eventName', currentEvent.event);
-                
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.success && data.participants?.length > 0) {
-                    const participantsList = data.participants.map((p, idx) => `
-                        <div class="modal-info-item">
-                            <strong>${idx + 1}</strong>
-                            <span>${p.nickname}${p.confirmation ? ' — ' + p.confirmation : ''}</span>
-                        </div>
-                    `).join('');
-                    
-                    content.innerHTML = `
-                        <div class="modal-header">Участники мероприятия</div>
-                        <div style="margin-bottom: 20px; color: #c9a87c; font-size: 14px; font-weight: 700;">
-                            Всего участников: ${data.count}
-                        </div>
-                        <div class="modal-info">
-                            ${participantsList}
-                        </div>
-                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
-                            Назад
-                        </button>
-                    `;
-                } else {
-                    content.innerHTML = `
-                        <div class="modal-header">Участники</div>
-                        <div class="empty-state">
-                            <div class="empty-state-icon">👥</div>
-                            <p>Пока никто не записался</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
-                            Назад
-                        </button>
-                    `;
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки участников:', error);
-                content.innerHTML = `
-                    <div class="modal-header">Ошибка</div>
-                    <div class="error-message">
-                        <div style="font-size: 48px; margin-bottom: 12px;">⚠️</div>
-                        <div style="font-size: 16px; font-weight: 700;">Не удалось загрузить список</div>
-                    </div>
-                    <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
-                        Назад
-                    </button>
-                `;
-            }
-        }
+document.getElementById('events-container').innerHTML=
+'<div class="loading">Нет мероприятий</div>';
 
-        async function register() {
-            const telegramInput = document.getElementById('telegram-input');
-            const telegram = telegramInput.value.trim();
-            
-            const isResident = currentEvent.residentStatus === 'Резидентский';
-            
-            let nickname = '';
-            if (!isResident) {
-                const nicknameInput = document.getElementById('nickname-input');
-                nickname = nicknameInput.value.trim();
-                
-                if (!nickname) {
-                    alert('Пожалуйста, введите ваш игровой никнейм');
-                    return;
-                }
-            }
+}
 
-            if (!telegram) {
-                alert('Пожалуйста, введите ваш Telegram ник');
-                return;
-            }
+}catch(e){
 
-            const button = event.target;
-            button.disabled = true;
-            button.textContent = 'Отправка...';
+document.getElementById('events-container').innerHTML=
+'<div class="loading">Ошибка подключения</div>';
 
-            try {
-                const url = new URL(API_BASE + '/register');
-                url.searchParams.append('eventDateTime', `${currentEvent.dateShort} ${currentEvent.time}`);
-                url.searchParams.append('event', currentEvent.event);
-                url.searchParams.append('telegram', telegram);
-                url.searchParams.append('nickname', nickname);
-                url.searchParams.append('location', currentEvent.location);
-                url.searchParams.append('residentStatus', currentEvent.residentStatus || '');
-                
-                console.log('Регистрация:', url.toString());
+}
 
-                const response = await fetch(url);
-                const data = await response.json();
+}
 
-                if (data.success) {
-                    document.getElementById('modal-content').innerHTML = `
-                        <div class="success-message">
-                            <div class="success-icon">✓</div>
-                            <div class="success-title">Вы успешно записаны!</div>
-                            <div class="success-details">
-                                <strong>${currentEvent.event}</strong><br>
-                                ${currentEvent.date}<br>
-                                ${currentEvent.time}<br>
-                                ${currentEvent.location}
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 24px; width: 100%;">
-                            Отлично!
-                        </button>
-                    `;
-                } else if (data.error === 'resident_only') {
-                    document.getElementById('modal-content').innerHTML = `
-                        <div class="modal-header">🔒 Доступ ограничен</div>
-                        <div class="error-message">
-                            <div style="font-size: 56px; margin-bottom: 16px;">⚠️</div>
-                            <div style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">
-                                Только для резидентов
-                            </div>
-                            <div style="font-size: 14px; line-height: 1.8; opacity: 0.9;">
-                                Предварительная запись доступна только для резидентов клуба.<br><br>
-                                Для получения статуса свяжитесь с администрацией.
-                            </div>
-                        </div>
-                        <button class="btn btn-secondary" onclick="openModal(${allEvents.indexOf(currentEvent)})" style="margin-top: 24px; width: 100%;">
-                            Назад
-                        </button>
-                    `;
-                } else {
-                    alert('❌ Ошибка регистрации: ' + (data.message || data.error || 'Неизвестная ошибка'));
-                    button.disabled = false;
-                    button.textContent = 'Записаться';
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('❌ Ошибка соединения: ' + error.message);
-                button.disabled = false;
-                button.textContent = 'Записаться';
-            }
-        }
+function displayEvents(events){
 
-        document.getElementById('modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
+const container=document.getElementById('events-container');
 
-        loadEvents();
-    </script>
+container.innerHTML=
+'<div class="calendar-grid">'+
+
+events.map((event,index)=>{
+
+const resident=event.residentStatus==='Резидентский';
+const open=event.status==='Открытый';
+
+return`
+
+<div class="event-card" onclick="openModal(${index})">
+
+<div>
+
+<div class="event-card-top">
+
+<div class="event-date">${event.date}</div>
+
+${resident?'<div class="resident">🔒 Резиденты</div>':''}
+
+</div>
+
+<div class="event-name">${event.event}</div>
+
+<div class="event-details">
+
+<div>🕐 ${event.time}</div>
+
+<div>📍 ${event.location}</div>
+
+<div>💰 ${event.price}</div>
+
+</div>
+
+</div>
+
+<div class="event-footer">
+
+<span class="status ${open?'status-open':'status-closed'}">
+
+${open?'Открыта запись':'Закрыта'}
+
+</span>
+
+<span style="color:var(--gold)">Подробнее</span>
+
+</div>
+
+</div>
+
+`;
+
+}).join('')+
+
+'</div>';
+
+}
+
+function getTelegramSafeId(){
+
+const user=tg.initDataUnsafe?.user;
+
+if(!user)return'';
+
+return user.username?'@'+user.username:'id'+user.id;
+
+}
+
+function openModal(index){
+
+currentEvent=allEvents[index];
+
+const modal=document.getElementById('modal');
+const content=document.getElementById('modal-content');
+
+const open=currentEvent.status==='Открытый';
+const resident=currentEvent.residentStatus==='Резидентский';
+
+content.innerHTML=`
+
+<div class="modal-header">${currentEvent.event}</div>
+
+<div class="modal-info">
+
+<div class="modal-row"><strong>Дата</strong><span>${currentEvent.date}</span></div>
+<div class="modal-row"><strong>Время</strong><span>${currentEvent.time}</span></div>
+<div class="modal-row"><strong>Место</strong><span>${currentEvent.location}</span></div>
+<div class="modal-row"><strong>Цена</strong><span>${currentEvent.price}</span></div>
+
+</div>
+
+<button class="btn btn-secondary" onclick="showParticipants()" style="width:100%;margin-bottom:16px;">
+👥 Список участников
+</button>
+
+${open?`
+
+<div class="input-group">
+<label>Telegram</label>
+<input id="telegram-input" value="${getTelegramSafeId()}">
+</div>
+
+${!resident?`
+<div class="input-group">
+<label>Игровой ник</label>
+<input id="nickname-input">
+</div>
+`:''}
+
+<div class="modal-buttons">
+
+<button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+
+<button class="btn btn-primary" onclick="register()">Записаться</button>
+
+</div>
+
+`:`
+
+<div style="text-align:center;padding:20px;">
+🔒 Регистрация закрыта
+</div>
+
+<button class="btn btn-secondary" onclick="closeModal()" style="width:100%;">
+Закрыть
+</button>
+
+`}
+
+`;
+
+modal.classList.add('active');
+
+}
+
+function closeModal(){
+document.getElementById('modal').classList.remove('active');
+}
+
+async function showParticipants(){
+
+const content=document.getElementById('modal-content');
+
+content.innerHTML='<div class="loading">Загрузка...</div>';
+
+const url=new URL(API_BASE+'/participants');
+
+url.searchParams.append('eventDate',currentEvent.dateShort);
+url.searchParams.append('eventName',currentEvent.event);
+
+const response=await fetch(url);
+const data=await response.json();
+
+if(data.success){
+
+content.innerHTML=
+'<div class="modal-header">Участники</div>'+
+data.participants.map((p,i)=>
+'<div>'+ (i+1)+'. '+p.nickname+'</div>'
+).join('')+
+'<button class="btn btn-secondary" onclick="openModal('+allEvents.indexOf(currentEvent)+')" style="margin-top:20px;width:100%;">Назад</button>';
+
+}
+
+}
+
+async function register(){
+
+const telegram=document.getElementById('telegram-input').value.trim();
+
+let nickname='';
+const nickInput=document.getElementById('nickname-input');
+
+if(nickInput)nickname=nickInput.value.trim();
+
+const url=new URL(API_BASE+'/register');
+
+url.searchParams.append('eventDateTime',`${currentEvent.dateShort} ${currentEvent.time}`);
+url.searchParams.append('event',currentEvent.event);
+url.searchParams.append('telegram',telegram);
+url.searchParams.append('nickname',nickname);
+url.searchParams.append('location',currentEvent.location);
+url.searchParams.append('residentStatus',currentEvent.residentStatus||'');
+
+const response=await fetch(url);
+const data=await response.json();
+
+if(data.success){
+
+document.getElementById('modal-content').innerHTML=
+'<div style="text-align:center;padding:30px;">✓ Вы записаны!</div>'+
+'<button class="btn btn-primary" onclick="closeModal()" style="width:100%;">Отлично</button>';
+
+}else{
+
+alert('Ошибка регистрации');
+
+}
+
+}
+
+document.getElementById('modal').addEventListener('click',function(e){
+if(e.target===this)closeModal();
+});
+
+loadEvents();
+
+</script>
+
 </body>
 </html>
